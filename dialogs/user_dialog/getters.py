@@ -110,6 +110,7 @@ async def get_username(msg: Message, widget: ManagedTextInput, dialog_manager: D
         await msg.answer('❗Юзернейм должен быть в формате "@username", пожалуйста попробуйте снова')
         return
     dialog_manager.dialog_data['username'] = text
+    await dialog_manager.switch_to(startSG.pay_menu)
 
 
 async def get_promo(msg: Message, widget: ManagedTextInput, dialog_manager: DialogManager, text: str):
