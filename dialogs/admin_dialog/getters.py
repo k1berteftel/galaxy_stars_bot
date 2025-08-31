@@ -170,7 +170,7 @@ async def application_menu_getter(dialog_manager: DialogManager, **kwargs):
         'sbp': 'СБП',
         'card': 'Карта',
         'crypto': 'Крипта (Oxa pay)',
-        'crypto_bot': 'Криптобот'
+        'cryptoBot': 'Криптобот'
     }
     types = {
         'stars': 'Покупка звезд',
