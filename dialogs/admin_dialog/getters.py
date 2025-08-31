@@ -47,7 +47,7 @@ async def get_static(clb: CallbackQuery, widget: Button, dialog_manager: DialogM
             f'бота: {len(users) - active}\n - Провзаимодействовали с ботом за последние 24 часа: {activity}\n\n'
             f'<b>Прирост аудитории:</b>\n - За сегодня: +{entry.get("today")}\n - Вчера: +{entry.get("yesterday")}'
             f'\n - Позавчера: + {entry.get("2_day_ago")}\n\n<b>Статистика покупок</b>\n - Всего покупок: '
-            f'{static.paymentsЪ}\n - Сумма покупок: {static.buys}₽')
+            f'{static.payments}\n - Сумма покупок: {static.buys}₽')
     await clb.message.answer(text=text)
 
 
