@@ -95,6 +95,7 @@ class TransactionConsumer:
         application = await session.get_application(app_id)
         user_id = application.user_id
         try:
+            user = await session.get_user(user_id)
             if buy == 'stars':
                 status = await transfer_stars(username, currency)
             elif buy == 'premium':
@@ -127,6 +128,8 @@ class TransactionConsumer:
                 stop_job.remove()
             if application.status != 2:
                 await session.update_application(app_id, 2, payment)
+            if user.referral:
+                await session.update_earn(user.referral, round(currency * 0.02))
             await session.add_payment()
             await session.add_buys(application.amount)
             await session.update_buys(user_id, application.amount)

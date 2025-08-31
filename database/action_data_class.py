@@ -158,6 +158,11 @@ class DataInteraction():
             result = await session.scalars(select(ApplicationsTable).order_by(ApplicationsTable.uid_key))
         return result.fetchall()
 
+    async def get_statistics(self):
+        async with self._sessions() as session:
+            result = await session.scalar(select(StaticsTable))
+        return result
+
     async def get_application(self, uid_key: int):
         async with self._sessions() as session:
             result = await session.scalar(select(ApplicationsTable).where(ApplicationsTable.uid_key == uid_key))
@@ -237,6 +242,13 @@ class DataInteraction():
             await session.execute(update(ApplicationsTable).where(ApplicationsTable.uid_key == uid_key).values(
                 status=status,
                 payment=payment
+            ))
+            await session.commit()
+
+    async def update_earn(self, user_id: int, earn: int):
+        async with self._sessions() as session:
+            await session.execute(update(UsersTable).where(UsersTable.user_id == user_id).values(
+                earn=UsersTable.earn + earn
             ))
             await session.commit()
 

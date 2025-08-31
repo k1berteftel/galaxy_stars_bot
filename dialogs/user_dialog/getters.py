@@ -141,8 +141,9 @@ async def ref_menu_getter(event_from_user: User, dialog_manager: DialogManager, 
     user = await session.get_user(event_from_user.id)
     text = (f'🎁<b>Реферальная программа</b>\n🔗Ваша ссылка:\n\t'
             f'<code>t.me/GalaxyStoreStarBot?start={event_from_user.id}</code>\n\n'
-            f'<blockquote>Тут у нас условия рефки</blockquote>\n - 👤Рефералы (lvl-1): {user.refs}\n - '
-            f'👥Рефералы (lvl-2): {user.sub_refs}\n - 💰Всего заработано: {user.earn}⭐️')
+            f'<blockquote>Вы получаете по 2% от каждой покупки вашего реферала</blockquote>'
+            f'\n - 👤Рефералы (lvl-1): {user.refs}\n - '
+            f'💰Всего заработано: {user.earn}⭐️')  # 👥Рефералы (lvl-2): {user.sub_refs}\n -
     return {
         'text': text,
         'url': f'http://t.me/share/url?url=https://t.me/GalaxyStoreStarBot?start={event_from_user.id}'
