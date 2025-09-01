@@ -134,7 +134,8 @@ async def process_payment_getter(event_from_user: User, dialog_manager: DialogMa
     amount = dialog_manager.dialog_data.get('amount')
     usdt = dialog_manager.dialog_data.get('usdt')
     url = dialog_manager.dialog_data.get('url')
-    text = f'<blockquote> - Сумма к оплате: {amount}₽ ({usdt}$)</blockquote>'
+    app_id = dialog_manager.dialog_data.get('app_id')
+    text = f'<blockquote> - Сумма к оплате: {amount}₽ ({usdt}$)</blockquote>\n<b> - Номер заказа: {app_id}</b>'
     return {
         'text': text,
         'url': url
