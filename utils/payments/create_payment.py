@@ -56,12 +56,12 @@ async def get_freekassa_card(user_id: int, amount: int):
 async def get_freekassa_sbp(user_id: int, amount: int):
     url = 'https://api.fk.life/v1/orders/create'
     data = {
-        'shopId': 64586,
+        'shopId': 65276,
         'nonce': int(datetime.datetime.today().timestamp()),
         'us_userId': str(user_id),
         'i': 44,
-        'email': f'{user_id}@xn--80aa3adxha4f.space.ru',
-        'ip': '5.35.94.138',
+        'email': f'{user_id}@telegram.org',
+        'ip': '5.35.91.55',
         'amount': str(amount),
         'currency': 'RUB'
     }
@@ -164,4 +164,4 @@ async def _get_ton_usdt() -> float:
     return ton
 
 
-#print(asyncio.run(get_freekassa_card(235235, 100)))
+print(asyncio.run(get_freekassa_sbp(235235, 100)))
