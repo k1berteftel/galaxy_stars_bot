@@ -11,6 +11,7 @@ class startSG(StatesGroup):
     get_promo = State()
 
     ref_menu = State()
+    get_derive_amount = State()
 
     rules_menu = State()
 

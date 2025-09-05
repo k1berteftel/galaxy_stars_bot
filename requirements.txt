@@ -7,6 +7,7 @@ aiocryptopay
 environs
 nats-py
 ormsgpack
+openpyxl
 greenlet
 pydantic
 SQLAlchemy

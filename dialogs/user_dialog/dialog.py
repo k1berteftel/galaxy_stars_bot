@@ -75,6 +75,7 @@ user_dialog = Dialog(
         Format('{text}'),
         Column(
             Url(Const('✈️Поделиться'), id='share_url', url=Format('{url}')),
+            Button(Const('💰Вывести'), id='get_derive_amount_switcher', on_click=getters.get_derive_amount_switcher),
         ),
         SwitchTo(Const('◀️Назад'), id='back', state=startSG.start),
         getter=getters.ref_menu_getter,
@@ -99,5 +100,14 @@ user_dialog = Dialog(
         SwitchTo(Const('◀️Назад'), id='back', state=startSG.start),
         getter=getters.rate_menu_getter,
         state=startSG.rate_menu
-    )
+    ),
+    Window(
+        Const('Введите сумму для вывода <em>(в Telegram stars⭐️)</em>'),
+        TextInput(
+            id='get_derive_amount',
+            on_success=getters.get_derive_amount
+        ),
+        SwitchTo(Const('🔙Назад'), id='back_ref_menu', state=startSG.ref_menu),
+        state=startSG.get_derive_amount
+    ),
 )

@@ -115,7 +115,8 @@ class TransactionConsumer:
             try:
                 await self.bot.send_message(
                     chat_id=user_id,
-                    text='✅Оплата была успешно совершенна, звезды были отправлены на счет'
+                    text='✅Оплата была успешно совершенна, звезды были отправлены на счет' if buy == 'stars'
+                    else '✅Оплата была успешно совершенна, премиум был успешно подарен'
                 )
             except Exception:
                 ...
