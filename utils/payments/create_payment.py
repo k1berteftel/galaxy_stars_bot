@@ -112,7 +112,7 @@ async def get_crypto_payment_data(amount: int | float):
     amount = round(amount / (usdt_rub), 2)
     invoice = await crypto_bot.create_invoice(asset='USDT', amount=amount)
     return {
-        'url': invoice.mini_app_invoice_url,
+        'url': invoice.bot_invoice_url,
         'id': invoice.invoice_id
     }
 
@@ -164,4 +164,4 @@ async def _get_ton_usdt() -> float:
     return ton
 
 
-print(asyncio.run(get_freekassa_sbp(235235, 100)))
+#print(asyncio.run(get_crypto_payment_data(50)))
