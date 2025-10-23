@@ -69,7 +69,7 @@ async def main():
     )
 
 
-    #"""
+    """
     users = [await db.get_user(6225820635)]
     apps = [*await db.get_user_applications(6225820635)]
     applications = [f'{app.__dict__}\n' for app in apps]
@@ -78,7 +78,7 @@ async def main():
         file.write('\n\n\n')
         file.writelines(applications)
     return
-    #"""
+    """
 
     nc, js = await connect_to_nats(servers=config.nats.servers)
     #storage: NatsStorage = await NatsStorage(nc=nc, js=js).create_storage()
