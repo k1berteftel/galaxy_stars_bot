@@ -28,12 +28,13 @@ def _get_signature(data: dict, api_key: str):
     return sorted_data
 
 
-async def get_freekassa_card(user_id: int, amount: int):
+async def get_freekassa_card(user_id: int, amount: int, app_id: int):
     url = 'https://api.fk.life/v1/orders/create'
     data = {
         'shopId': 65276,
         'nonce': int(datetime.datetime.today().timestamp()),
         'us_userId': str(user_id),
+        'us_appId': str(app_id),
         'i': 36,
         'email': f'{user_id}@telegram.org',
         'ip': '5.35.91.55',
@@ -53,12 +54,13 @@ async def get_freekassa_card(user_id: int, amount: int):
     }
 
 
-async def get_freekassa_sbp(user_id: int, amount: int):
+async def get_freekassa_sbp(user_id: int, amount: int, app_id: int):
     url = 'https://api.fk.life/v1/orders/create'
     data = {
         'shopId': 65276,
         'nonce': int(datetime.datetime.today().timestamp()),
         'us_userId': str(user_id),
+        'us_appId': str(app_id),
         'i': 44,
         'email': f'{user_id}@telegram.org',
         'ip': '5.35.91.55',

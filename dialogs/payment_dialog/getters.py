@@ -83,9 +83,9 @@ async def payment_choose(clb: CallbackQuery, widget: Button, dialog_manager: Dia
         usdt = round(amount / (usdt_rub), 2)
 
     if payment_type == 'card':
-        payment = await get_freekassa_card(clb.from_user.id, amount)
+        payment = await get_freekassa_card(clb.from_user.id, amount, app_id)
     elif payment_type == 'sbp':
-        payment = await get_freekassa_sbp(clb.from_user.id, amount)
+        payment = await get_freekassa_sbp(clb.from_user.id, amount, app_id)
     elif payment_type == 'crypto':
         payment = await get_oxa_payment_data(amount)
         task = asyncio.create_task(
