@@ -39,6 +39,9 @@ async def menu_getter(event_from_user: User, dialog_manager: DialogManager, **kw
     usdt_rub = await _get_usdt_rub()
     if rate == 'stars':
         usdt = await get_stars_price(currency)
+        if usdt is None:
+            await dialog_manager.done()
+            return
         amount = round((usdt * usdt_rub) / (1 - prices.stars_charge / 100), 2)
         if promo:
             amount = amount - (amount * promo / 100)
