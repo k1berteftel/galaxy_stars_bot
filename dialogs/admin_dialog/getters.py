@@ -139,16 +139,25 @@ async def admin_menu_getter(dialog_manager: DialogManager, **kwargs):
 
 
 async def get_app_uid(msg: Message, widget: ManagedTextInput, dialog_manager: DialogManager, text: str):
+    session: DataInteraction = dialog_manager.middleware_data.get('session')
     try:
         uid_key = int(text)
+        application = await session.get_application(uid_key)
     except Exception:
-        await msg.delete()
-        await msg.answer('Номер заказа должен быть числом, пожалуйста попробуйте еще раз')
-        return
-    session: DataInteraction = dialog_manager.middleware_data.get('session')
-    application = await session.get_application(uid_key)
+        if not text.startswith('@'):
+            await msg.delete()
+            await msg.answer('Введенный текст должен быть номером заказа или юзернеймом пользователя, '
+                             'пожалуйста попробуйте еще раз')
+            return
+        user = await session.get_user_by_username(text[1::])
+        if not user:
+            await msg.delete()
+            await msg.answer('Такого пользователя не найдено')
+            return
+        application = await session.get_last_application(user.user_id)
+
     if not application:
-        await msg.answer('Заказа с таким номером не найдено')
+        await msg.answer('Заказов не найдено')
         return
     dialog_manager.dialog_data['uid_key'] = application.uid_key
     await dialog_manager.switch_to(adminSG.application_menu)
@@ -280,13 +289,13 @@ async def get_percent(msg: Message, widget: ManagedTextInput, dialog_manager: Di
 
 async def get_mail(msg: Message, widget: MessageInput, dialog_manager: DialogManager):
     if msg.text:
-        dialog_manager.dialog_data['text'] = msg.text
+        dialog_manager.dialog_data['text'] = msg.html_text
     elif msg.photo:
         dialog_manager.dialog_data['photo'] = msg.photo[0].file_id
-        dialog_manager.dialog_data['caption'] = msg.caption
+        dialog_manager.dialog_data['caption'] = msg.html_text
     elif msg.video:
         dialog_manager.dialog_data['video'] = msg.video.file_id
-        dialog_manager.dialog_data['caption'] = msg.caption
+        dialog_manager.dialog_data['caption'] = msg.html_text
     else:
         await msg.answer('Что-то пошло не так, пожалуйста попробуйте снова')
     await dialog_manager.switch_to(adminSG.get_time)

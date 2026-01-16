@@ -91,7 +91,7 @@ admin_dialog = Dialog(
         state=adminSG.admin_del
     ),
     Window(
-        Const('Введите номер заказа'),
+        Const('Введите номер заказа или @username покупателя'),
         TextInput(
             id='get_app_uid',
             on_success=getters.get_app_uid
