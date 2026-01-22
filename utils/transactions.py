@@ -60,6 +60,9 @@ async def get_stars_price(amount: int) -> float:
     return round(float(data['price']) * ton, 5)
 
 
+#print(asyncio.run(get_stars_price(50)))
+
+
 @subgram_api_decorator()
 async def transfer_stars(username: str, stars: int) -> bool:
     url = BASE_URL + 'api/purchase'

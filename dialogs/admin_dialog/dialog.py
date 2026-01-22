@@ -18,6 +18,7 @@ admin_dialog = Dialog(
             SwitchTo(Const('Найти заказ'), id='get_app_uid_switcher', state=adminSG.get_app_uid),
             SwitchTo(Const('🔗 Управление диплинками'), id='deeplinks_menu_switcher', state=adminSG.deeplink_menu),
             SwitchTo(Const('👥 Управление админами'), id='admin_menu_switcher', state=adminSG.admin_menu),
+            SwitchTo(Const('Управление ОП'), id='op_menu_switcher', state=adminSG.op_menu),
             SwitchTo(Const('Управление промокодами'), id='promos_menu_switcher', state=adminSG.promos_menu),
             SwitchTo(Const('Управление наценкой'), id='charge_menu_switcher', state=adminSG.charge_menu),
             Button(Const('📋Выгрузка базы пользователей'), id='get_users_txt', on_click=getters.get_users_txt),
@@ -220,5 +221,62 @@ admin_dialog = Dialog(
         ),
         SwitchTo(Const('Назад'), id='back_get_keyboard', state=adminSG.get_keyboard),
         state=adminSG.confirm_mail
+    ),
+    Window(
+        Const('🔗 Введите свою ссылку на канал или пропустите этот шаг, '
+              'чтобы бот сам подобрал ссылку для канала или чата'),
+        TextInput(
+            id='get_button_link',
+            on_success=getters.get_button_link
+        ),
+        Button(Const('⏭ Пропустить'), id='continue_no_link', on_click=getters.save_without_link),
+        state=adminSG.get_button_link
+    ),
+    Window(
+        Format('📋 *Меню управления ОП*\n\n'
+               '📋 *Действующие каналы*:\n\n {buttons}'),
+        Column(
+            SwitchTo(Const('➕ Добавить канал'), id='get_op_channel_switcher', state=adminSG.get_op_channel),
+        ),
+        Group(
+            Select(
+                Format('💼 {item[0]}'),
+                id='buttons_builder',
+                item_id_getter=lambda x: x[1],
+                items='items',
+                on_click=getters.op_buttons_switcher
+            ),
+            width=1
+        ),
+        SwitchTo(Const('🔙 Назад'), id='back', state=adminSG.start),
+        getter=getters.op_menu_getter,
+        state=adminSG.op_menu
+    ),
+    Window(
+        Const("Отправьте ссылку канал (если он открытый) или его chat ID если канал закрытый\n\n"
+              "<b>❗️Перед этим добавьте бота в канал и назначьте админом, со всеми правами</b>"),
+        TextInput(
+            id='get_op_chat_id',
+            on_success=getters.get_op_channel
+        ),
+        SwitchTo(Const('Назад'), id='back_op_menu', state=adminSG.op_menu),
+        state=adminSG.get_op_channel
+    ),
+    Window(
+        Format('Канал|Чат {channel_name}\nУказанная ссылка на канал|чат: {channel_link}'),
+        SwitchTo(Const('Изменить ссылку на канал'), id='change_button_link_switcher', state=adminSG.change_button_link),
+        Button(Const('➖Удалить канал с ОП'), id='del_op_channel', on_click=getters.del_op_channel),
+        SwitchTo(Const('Назад'), id='back_op_menu', state=adminSG.op_menu),
+        getter=getters.button_menu_getter,
+        state=adminSG.button_menu
+    ),
+    Window(
+        Const('🔗 Введите новую ссылку для кнопки\n\n'
+              '⚠️ <em>Важно: ссылка должна вести на тот же канал, иначе могут возникнуть проблемы с проверкой ОП</em>'),
+        TextInput(
+            id='change_button_link',
+            on_success=getters.change_button_link
+        ),
+        state=adminSG.change_button_link
     ),
 )

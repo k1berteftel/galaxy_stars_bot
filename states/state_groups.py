@@ -23,6 +23,10 @@ class PaymentSG(StatesGroup):
     process_payment = State()
 
 
+class SubSG(StatesGroup):
+    start = State()
+
+
 class adminSG(StatesGroup):
     start = State()
 
@@ -38,12 +42,21 @@ class adminSG(StatesGroup):
     admin_del = State()
     admin_add = State()
 
+    op_menu = State()
+    get_op_channel = State()
+    get_button_link = State()
+    button_menu = State()
+    change_button_text = State()
+    change_button_link = State()
+
     promos_menu = State()
     del_promo = State()
     get_promo = State()
     get_limit = State()
     get_percent = State()
+
     charge_menu = State()
     get_charge = State()
+
     get_app_uid = State()
     application_menu = State()

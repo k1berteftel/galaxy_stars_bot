@@ -24,7 +24,7 @@ from config_data.config import load_config, Config
 from handlers.user_handlers import user_router
 from dialogs import get_dialogs
 from utils.schedulers import clean_applications
-from middlewares import TransferObjectsMiddleware, RemindMiddleware
+from middlewares import TransferObjectsMiddleware, RemindMiddleware, OpMiddleware
 
 
 timezone = pytz.timezone('Europe/Moscow')
@@ -89,13 +89,15 @@ async def main():
     # подключаем роутеры
     dp.include_routers(user_router, *get_dialogs())
 
+    setup_dialogs(dp)
+
     # подключаем middleware
     dp.update.middleware(TransferObjectsMiddleware())
+    dp.callback_query.middleware(OpMiddleware())
     dp.callback_query.middleware(RemindMiddleware())
 
     # запуск
     await bot.delete_webhook(drop_pending_updates=True)
-    setup_dialogs(dp)
 
     logger.info('Bot start polling')
 

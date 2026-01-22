@@ -69,6 +69,14 @@ class AdminsTable(Base):
     name: Mapped[str] = mapped_column(VARCHAR)
 
 
+class OneTimeLinksIdsTable(Base):
+    __tablename__ = 'links'
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+
+    link: Mapped[str] = mapped_column(VARCHAR)
+
+
 class PromosTable(Base):
     __tablename__ = 'promos'
 
@@ -88,11 +96,13 @@ class UserPromoTable(Base):
     promo: Mapped[str] = mapped_column(ForeignKey('promos.promo', ondelete='CASCADE'))
 
 
-class OneTimeLinksIdsTable(Base):
-    __tablename__ = 'links'
+class OpTable(Base):
+    __tablename__ = 'categories'
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
 
+    chat_id: Mapped[int] = mapped_column(BigInteger)
+    name: Mapped[str] = mapped_column(VARCHAR)
     link: Mapped[str] = mapped_column(VARCHAR)
 
 

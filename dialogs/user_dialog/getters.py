@@ -237,7 +237,7 @@ async def rate_menu_getter(event_from_user: User, dialog_manager: DialogManager,
     usdt_rub = await _get_usdt_rub()
     usdt_ton = await _get_ton_usdt()
     ton_rub = round(usdt_ton * usdt_rub, 4)
-    usdt = await get_stars_price(1)
+    usdt = (await get_stars_price(50)) / 50
     print(usdt)
     amount = round((usdt * usdt_rub) / (1 - prices.stars_charge / 100), 2)
     usdt = round(amount / usdt_rub, 3)

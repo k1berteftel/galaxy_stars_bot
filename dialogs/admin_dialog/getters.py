@@ -287,6 +287,111 @@ async def get_percent(msg: Message, widget: ManagedTextInput, dialog_manager: Di
     await dialog_manager.switch_to(adminSG.promos_menu)
 
 
+async def save_without_link(clb: CallbackQuery, widget: Button, dialog_manager: DialogManager):
+    bot: Bot = dialog_manager.middleware_data.get('bot')
+    session: DataInteraction = dialog_manager.middleware_data.get('session')
+    chat_id = dialog_manager.dialog_data.get('chat_id')
+    chat = await bot.get_chat(chat_id)
+    await session.add_op(
+        chat_id=chat_id,
+        name=chat.title,
+        link=chat.invite_link,
+    )
+    await clb.answer('Кнопка на ОП была успешно сохранена')
+    dialog_manager.dialog_data.clear()
+    await dialog_manager.switch_to(adminSG.start)
+
+
+async def get_button_link(msg: Message, widget: ManagedTextInput, dialog_manager: DialogManager, text: str):
+    if len(text.split('/')) <= 1:
+        await msg.answer('Вы ввели ссылку не в том формате, пожалуйста попробуйте снова')
+        return
+    session: DataInteraction = dialog_manager.middleware_data.get('session')
+    bot: Bot = dialog_manager.middleware_data.get('bot')
+    chat_id = dialog_manager.dialog_data.get('chat_id')
+    chat = await bot.get_chat(chat_id)
+    await session.add_op(
+        chat_id=chat_id,
+        name=chat.title,
+        link=text,
+    )
+    await msg.answer('Кнопка на ОП была успешно сохранена')
+    dialog_manager.dialog_data.clear()
+    await dialog_manager.switch_to(adminSG.op_menu)
+
+
+async def op_buttons_switcher(clb: CallbackQuery, widget: Select, dialog_manager: DialogManager, item_id: str):
+    dialog_manager.dialog_data['chat_id'] = int(item_id)
+    await dialog_manager.switch_to(adminSG.button_menu)
+
+
+async def button_menu_getter(dialog_manager: DialogManager, **kwargs):
+    session: DataInteraction = dialog_manager.middleware_data.get('session')
+    chat_id = dialog_manager.dialog_data.get('chat_id')
+    button = await session.get_op_by_chat_id(chat_id)
+    return {
+        'channel_name': button.name,
+        'channel_link': button.link
+    }
+
+
+async def del_op_channel(clb: CallbackQuery, widget: Button, dialog_manager: DialogManager):
+    session: DataInteraction = dialog_manager.middleware_data.get('session')
+    chat_id = dialog_manager.dialog_data.get('chat_id')
+    await session.del_op_channel(chat_id)
+    await clb.answer('Канал был успешно удален с ОП')
+    dialog_manager.dialog_data.clear()
+    await dialog_manager.switch_to(adminSG.op_menu)
+
+
+async def change_button_link(msg: Message, widget: ManagedTextInput, dialog_manager: DialogManager, text: str):
+    session: DataInteraction = dialog_manager.middleware_data.get('session')
+    chat_id = dialog_manager.dialog_data.get('chat_id')
+    await session.set_button_link(chat_id, link=text)
+    await dialog_manager.switch_to(adminSG.button_menu)
+
+
+async def op_menu_getter(dialog_manager: DialogManager, **kwargs):
+    session: DataInteraction = dialog_manager.middleware_data.get('session')
+    categories = await session.get_op()
+    text = ''
+    buttons = []
+    count = 1
+    for category in categories:
+        buttons.append((category.name, category.chat_id))
+        text += f'{count}: {category.name} - {category.link}\n'
+        count += 1
+    return {
+        'buttons': text,
+        'items': buttons
+    }
+
+
+async def get_op_channel(msg: Message, widget: ManagedTextInput, dialog_manager: DialogManager, text: str):
+    await msg.delete()
+    try:
+        chat_id = int(text)
+    except Exception:
+        fragments = text.split('/')
+        if len(fragments) <= 1:
+            await msg.answer('Отправленное вами сообщение не воспринимается ссылок, пожалуйста попробуйте еще раз')
+            return
+        chat_id = '@' + fragments[-1]
+    try:
+        chat = await msg.bot.get_chat(chat_id)
+    except Exception:
+        await msg.answer('К сожалению такого канала не найдено или вы не добавили бота в канал | чат c '
+                         'админскими правами, пожалуйста попробуйте снова')
+        return
+    session: DataInteraction = dialog_manager.middleware_data.get('session')
+    op_channels = await session.get_op()
+    if chat.id in [channel.chat_id for channel in op_channels]:
+        await msg.answer('Этот канал уже добавлен на ОП, чтобы добавить его повторно удалите его')
+        return
+    dialog_manager.dialog_data['chat_id'] = chat.id
+    await dialog_manager.switch_to(adminSG.get_button_link)
+
+
 async def get_mail(msg: Message, widget: MessageInput, dialog_manager: DialogManager):
     if msg.text:
         dialog_manager.dialog_data['text'] = msg.html_text

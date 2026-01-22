@@ -5,7 +5,7 @@ from sqlalchemy import select, insert, update, column, text, delete, and_
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from database.model import (UsersTable, DeeplinksTable, OneTimeLinksIdsTable, AdminsTable, PromosTable,
-                            UserPromoTable, ApplicationsTable, PricesTable, StaticsTable)
+                            UserPromoTable, ApplicationsTable, PricesTable, StaticsTable, OpTable)
 
 
 async def setup_database(session: async_sessionmaker):
@@ -43,6 +43,15 @@ class DataInteraction():
         async with self._sessions() as session:
             result = await session.scalar(select(UsersTable).where(UsersTable.user_id == user_id))
         return True if result else False
+
+    async def add_op(self, chat_id: int, name: str, link: str):
+        async with self._sessions() as session:
+            await session.execute(insert(OpTable).values(
+                chat_id=chat_id,
+                name=name,
+                link=link
+            ))
+            await session.commit()
 
     async def add_promo(self, promo: str, limit: int, percent: int):
         async with self._sessions() as session:
@@ -157,6 +166,16 @@ class DataInteraction():
         async with self._sessions() as session:
             result = await session.scalars(select(ApplicationsTable).order_by(ApplicationsTable.uid_key))
         return result.fetchall()
+
+    async def get_op(self):
+        async with self._sessions() as session:
+            result = await session.scalars(select(OpTable))
+        return result.fetchall()
+
+    async def get_op_by_chat_id(self, chat_id: int):
+        async with self._sessions() as session:
+            result = await session.scalar(select(OpTable).where(OpTable.chat_id == chat_id))
+        return result
 
     async def get_statistics(self):
         async with self._sessions() as session:
@@ -288,6 +307,13 @@ class DataInteraction():
             ))
             await session.commit()
 
+    async def set_button_link(self, chat_id: int, link: str):
+        async with self._sessions() as session:
+            await session.execute(update(OpTable).where(OpTable.chat_id == chat_id).values(
+                link=link
+            ))
+            await session.commit()
+
     async def del_deeplink(self, link: str):
         async with self._sessions() as session:
             await session.execute(delete(DeeplinksTable).where(DeeplinksTable.link == link))
@@ -311,4 +337,9 @@ class DataInteraction():
     async def del_application(self, uid_key: int):
         async with self._sessions() as session:
             await session.execute(delete(ApplicationsTable).where(ApplicationsTable.uid_key == uid_key))
+            await session.commit()
+
+    async def del_op_channel(self, chat_id: int):
+        async with self._sessions() as session:
+            await session.execute(delete(OpTable).where(OpTable.chat_id == chat_id))
             await session.commit()
