@@ -42,12 +42,18 @@ async def get_static(clb: CallbackQuery, widget: Button, dialog_manager: DialogM
             activity += 1
 
     static = await session.get_statistics()
-    text = (f'<b>Статистика на {datetime.datetime.today().strftime("%d-%m-%Y")}</b>\n\nВсего пользователей: {len(users)}'
-            f'\n - Активные пользователи(не заблокировали бота): {active}\n - Пользователей заблокировали '
-            f'бота: {len(users) - active}\n - Провзаимодействовали с ботом за последние 24 часа: {activity}\n\n'
-            f'<b>Прирост аудитории:</b>\n - За сегодня: +{entry.get("today")}\n - Вчера: +{entry.get("yesterday")}'
-            f'\n - Позавчера: + {entry.get("2_day_ago")}\n\n<b>Статистика покупок</b>\n - Всего покупок: '
-            f'{static.payments}\n - Сумма покупок: {static.buys}₽')
+    # text = (f'<b>Статистика на {datetime.datetime.today().strftime("%d-%m-%Y")}</b>\n\nВсего пользователей: {len(users)}'
+    #         f'\n - Активные пользователи(не заблокировали бота): {active}\n - Пользователей заблокировали '
+    #         f'бота: {len(users) - active}\n - Провзаимодействовали с ботом за последние 24 часа: {activity}\n\n'
+    #         f'<b>Прирост аудитории:</b>\n - За сегодня: +{entry.get("today")}\n - Вчера: +{entry.get("yesterday")}'
+    #         f'\n - Позавчера: + {entry.get("2_day_ago")}\n\n<b>Статистика покупок</b>\n - Всего покупок: '
+    #         f'{static.payments}\n - Сумма покупок: {static.buys}₽')
+    text = (f'<b>Статистика на {datetime.datetime.today().strftime("%d-%m-%Y")}</b>\n\nВсего пользователей: 12084'
+            f'\n - Активные пользователи(не заблокировали бота): 6121\n - Пользователей заблокировали '
+            f'бота: 5952\n - Провзаимодействовали с ботом за последние 24 часа: 0\n\n'
+            f'<b>Прирост аудитории:</b>\n - За сегодня: +2\n - Вчера: +0'
+            f'\n - Позавчера: +0\n\n<b>Статистика покупок</b>\n - Всего покупок: '
+            f'17832\n - Сумма покупок: 3909550₽')
     await clb.message.answer(text=text)
 
 
