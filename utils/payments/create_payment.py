@@ -2,6 +2,7 @@ import asyncio
 import datetime
 import hmac
 import hashlib
+from typing import Literal
 from aiohttp import ClientSession
 
 from aiocryptopay import AioCryptoPay, Networks
@@ -13,70 +14,111 @@ config: Config = load_config()
 crypto_bot = AioCryptoPay(token=config.crypto_bot.token, network=Networks.MAIN_NET)
 
 
-def _get_signature(data: dict, api_key: str):
-    print('data before', data)
-    sorted_data = dict(sorted(data.items(), key=lambda item: item[0]))
-    print('data after ', sorted_data)
-    message = '|'.join(str(v) for v in sorted_data.values())
-    print(message)
-    signature = hmac.new(
-        key=api_key.encode('utf-8'),
-        msg=message.encode('utf-8'),
-        digestmod=hashlib.sha256
-    ).hexdigest()
-    sorted_data['signature'] = signature
-    return sorted_data
+# def _get_signature(data: dict, api_key: str):
+#     print('data before', data)
+#     sorted_data = dict(sorted(data.items(), key=lambda item: item[0]))
+#     print('data after ', sorted_data)
+#     message = '|'.join(str(v) for v in sorted_data.values())
+#     print(message)
+#     signature = hmac.new(
+#         key=api_key.encode('utf-8'),
+#         msg=message.encode('utf-8'),
+#         digestmod=hashlib.sha256
+#     ).hexdigest()
+#     sorted_data['signature'] = signature
+#     return sorted_data
 
 
-async def get_freekassa_card(user_id: int, amount: int, app_id: int):
-    url = 'https://api.fk.life/v1/orders/create'
+# async def get_freekassa_card(user_id: int, amount: int, app_id: int):
+#     url = 'https://api.fk.life/v1/orders/create'
+#     data = {
+#         'shopId': 65276,
+#         'nonce': int(datetime.datetime.today().timestamp()),
+#         'us_userId': str(user_id),
+#         'us_appId': str(app_id),
+#         'i': 36,
+#         'email': f'{user_id}@telegram.org',
+#         'ip': '5.35.91.55',
+#         'amount': str(amount),
+#         'currency': 'RUB'
+#     }
+#     data = _get_signature(data, config.freekassa.api_key)
+#     async with ClientSession() as session:
+#         async with session.post(url, json=data, ssl=False) as resp:
+#             if resp.status != 200:
+#                 print(await resp.json())
+#                 print(resp.status)
+#                 return False
+#             data = await resp.json()
+#     return {
+#         'url': data['location'],
+#     }
+#
+#
+# #print(asyncio.run(get_freekassa_card(8005178596, 100, 123141499)))
+#
+#
+# async def get_freekassa_sbp(user_id: int, amount: int, app_id: int):
+#     url = 'https://api.fk.life/v1/orders/create'
+#     data = {
+#         'shopId': 65276,
+#         'nonce': int(datetime.datetime.today().timestamp()),
+#         'us_userId': str(user_id),
+#         'us_appId': str(app_id),
+#         'i': 44,
+#         'email': f'{user_id}@telegram.org',
+#         'ip': '5.35.91.55',
+#         'amount': str(amount),
+#         'currency': 'RUB'
+#     }
+#     data = _get_signature(data, config.freekassa.api_key)
+#     async with ClientSession() as session:
+#         async with session.post(url, json=data, ssl=False) as resp:
+#             if resp.status != 200:
+#                 print(await resp.json())
+#                 print(resp.status)
+#                 return False
+#             data = await resp.json()
+#     return {
+#         'url': data['location'],
+#     }
+
+
+# print(asyncio.run(get_freekassa_sbp(8005178596, 100, 123141490)))
+
+
+async def get_paycore_payment(amount: int | float, app_id: int, payment_type: Literal['sbp', 'card'], stars: int = None, username: str = None):
+    url = 'https://paycore.ltd/api/init'
+    headers = {
+        'Content-Type': 'application/json',
+        'X-Api-Key': config.paycore.api_key,
+    }
     data = {
-        'shopId': 65276,
-        'nonce': int(datetime.datetime.today().timestamp()),
-        'us_userId': str(user_id),
-        'us_appId': str(app_id),
-        'i': 36,
-        'email': f'{user_id}@telegram.org',
-        'ip': '5.35.91.55',
-        'amount': str(amount),
-        'currency': 'RUB'
+        "method": payment_type,
+        "amount": amount,
+        "description": f"Оплата заказа №{app_id}",
+        "returnLink": "https://test.ru/paycore",
     }
-    data = _get_signature(data, config.freekassa.api_key)
+    if stars:
+        data["starsPayment"] = True
+        data["starsAmount"] = stars
+        data["starsAccount"] = username
     async with ClientSession() as session:
-        async with session.post(url, json=data, ssl=False) as resp:
-            if resp.status != 200:
-                print(await resp.json())
-                print(resp.status)
-                return False
-            data = await resp.json()
-    return {
-        'url': data['location'],
-    }
+        async with session.post(url, json=data, headers=headers) as res:
+            if res.status not in [200, 201]:
+                print(res.status)
+                try:
+                    print(await res.json())
+                except Exception:
+                    print(await res.text())
+                return None
+            data = await res.json()
+            url = data.get('url')
+            order_id = data.get('order_id')
 
-
-async def get_freekassa_sbp(user_id: int, amount: int, app_id: int):
-    url = 'https://api.fk.life/v1/orders/create'
-    data = {
-        'shopId': 65276,
-        'nonce': int(datetime.datetime.today().timestamp()),
-        'us_userId': str(user_id),
-        'us_appId': str(app_id),
-        'i': 44,
-        'email': f'{user_id}@telegram.org',
-        'ip': '5.35.91.55',
-        'amount': str(amount),
-        'currency': 'RUB'
-    }
-    data = _get_signature(data, config.freekassa.api_key)
-    async with ClientSession() as session:
-        async with session.post(url, json=data, ssl=False) as resp:
-            if resp.status != 200:
-                print(await resp.json())
-                print(resp.status)
-                return False
-            data = await resp.json()
     return {
-        'url': data['location'],
+        'url': url,
+        'order_id': order_id
     }
 
 
@@ -157,6 +199,9 @@ async def _get_usdt_rub() -> float:
     return float(rub)
 
 
+# print(asyncio.run(_get_usdt_rub())
+
+
 async def _get_ton_usdt() -> float:
     url = 'https://api.coingecko.com/api/v3/coins/the-open-network'
     async with ClientSession() as session:
@@ -164,6 +209,3 @@ async def _get_ton_usdt() -> float:
             resp = await res.json()
             ton = float(resp['market_data']['current_price']['usd'])
     return ton
-
-
-#print(asyncio.run(get_crypto_payment_data(50)))

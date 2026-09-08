@@ -18,6 +18,12 @@ class startSG(StatesGroup):
     rate_menu = State()
 
 
+class GiftsSG(StatesGroup):
+    choose_gift = State()
+    choose_receiver = State()
+    get_receiver = State()
+
+
 class PaymentSG(StatesGroup):
     menu = State()
     process_payment = State()

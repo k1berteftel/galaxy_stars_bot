@@ -13,7 +13,7 @@ from nats.js import JetStreamContext
 from nats.js.api import StreamConfig, StorageType, RetentionPolicy
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-from utils.transactions import transfer_stars, transfer_ton, transfer_premium
+from utils.transactions import transfer_stars, transfer_ton, transfer_premium, transfer_gift
 from database.action_data_class import DataInteraction
 from database.build import PostgresBuild
 from config_data.config import Config, load_config
@@ -96,6 +96,8 @@ class TransactionConsumer:
         user_id = application.user_id
         try:
             user = await session.get_user(user_id)
+            if buy == 'deleted_gift':
+                status = await transfer_gift(username, currency)
             if buy == 'stars':
                 status = await transfer_stars(username, currency)
             elif buy == 'premium':

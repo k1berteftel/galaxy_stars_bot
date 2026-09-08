@@ -16,4 +16,5 @@ fastapi
 uvicorn
 nats-py
 python-multipart
+kurigram
 

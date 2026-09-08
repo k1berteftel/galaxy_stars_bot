@@ -39,6 +39,11 @@ class FreeKassa:
 
 
 @dataclass
+class Paycore:
+    api_key: str
+
+
+@dataclass
 class NatsConfig:
     servers: list[str]
 
@@ -51,6 +56,13 @@ class ConsumerConfig:
 
 
 @dataclass
+class UserBot:
+    api_id: int
+    api_hash: str
+    session: str
+
+
+@dataclass
 class Config:
     bot: tg_bot
     db: DB
@@ -60,6 +72,8 @@ class Config:
     fragment: Fragment
     oxa: Oxa
     freekassa: FreeKassa
+    paycore: Paycore
+    user_bot: UserBot
 
 
 def load_config(path: str | None = None) -> Config:
@@ -93,5 +107,13 @@ def load_config(path: str | None = None) -> Config:
         ),
         freekassa=FreeKassa(
             api_key=env('freekassa_api_key')
+        ),
+        paycore=Paycore(
+            api_key=env('paycore_api_key')
+        ),
+        user_bot=UserBot(
+            api_id=int(env('api_id')),
+            api_hash=env('api_hash'),
+            session=env('session_name')
         )
     )

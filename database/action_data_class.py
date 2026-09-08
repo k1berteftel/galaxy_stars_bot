@@ -5,7 +5,7 @@ from sqlalchemy import select, insert, update, column, text, delete, and_
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from database.model import (UsersTable, DeeplinksTable, OneTimeLinksIdsTable, AdminsTable, PromosTable,
-                            UserPromoTable, ApplicationsTable, PricesTable, StaticsTable, OpTable)
+                            UserPromoTable, ApplicationsTable, PricesTable, StaticsTable, OpTable, PaycorePayment)
 
 
 async def setup_database(session: async_sessionmaker):
@@ -162,10 +162,28 @@ class DataInteraction():
                 return await self.add_application(user_id, receiver, amount, rub, usdt, buy, count+1)
             return await self.get_application(uid_key)
 
+    async def add_paycore_app(self, app_id: int, order_id: str):
+        async with self._sessions() as session:
+            await session.execute(insert(PaycorePayment).values(
+                app_id=app_id,
+                order_id=order_id
+            ))
+            await session.commit()
+
     async def get_applications(self):
         async with self._sessions() as session:
             result = await session.scalars(select(ApplicationsTable).order_by(ApplicationsTable.uid_key))
         return result.fetchall()
+
+    async def get_paycore_app_by_order_id(self, order_id: str):
+        async with self._sessions() as session:
+            result = await session.scalar(select(PaycorePayment).where(PaycorePayment.order_id == order_id))
+        return result
+
+    async def get_paycore_app_by_app_id(self, app_id: int):
+        async with self._sessions() as session:
+            result = await session.scalar(select(PaycorePayment).where(PaycorePayment.app_id == app_id))
+        return result
 
     async def get_op(self):
         async with self._sessions() as session:
@@ -313,6 +331,15 @@ class DataInteraction():
                 link=link
             ))
             await session.commit()
+
+    # async def set_static_value(self, column: str, value: any):
+    #     async with self._sessions() as session:
+    #         await session.execute(update(StaticsTable).values(
+    #             {
+    #                 column: value
+    #             }
+    #         ))
+    #         await session.commit()
 
     async def del_deeplink(self, link: str):
         async with self._sessions() as session:

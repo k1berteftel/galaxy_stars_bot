@@ -1,12 +1,13 @@
 from aiogram_dialog import Dialog, Window
 from aiogram_dialog.widgets.kbd import SwitchTo, Column, Row, Button, Group, Select, Start, Url
 from aiogram_dialog.widgets.text import Format, Const
+from aiogram_dialog.widgets.style import Style
 from aiogram_dialog.widgets.input import TextInput
 from aiogram_dialog.widgets.media import DynamicMedia
 
 from dialogs.user_dialog import getters
 
-from states.state_groups import startSG, adminSG
+from states.state_groups import startSG, adminSG, GiftsSG
 
 user_dialog = Dialog(
     Window(
@@ -16,6 +17,8 @@ user_dialog = Dialog(
         Column(
             Button(Const('⭐️Купить звезды'), id='stars_pay_choose', on_click=getters.pay_choose),
             Button(Const('👑Купить премиум'), id='premium_pay_choose', on_click=getters.pay_choose),
+            Start(Const('Удаленные подарки'), id='gift_dialog', state=GiftsSG.choose_gift,
+                  style=Style(emoji_id="5203996991054432397")),
         ),
         Row(
             SwitchTo(Const('🎁Реферальная программа'), id='ref_menu_switcher', state=startSG.ref_menu),

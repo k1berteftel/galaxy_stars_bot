@@ -78,9 +78,9 @@ async def get_currency_amount(msg: Message, widget: ManagedTextInput, dialog_man
             await msg.delete()
             await msg.answer('❗️Кол-во звезд должно быть числом, пожалуйста попробуйте снова')
             return
-        if not (50 <= currency < 1000000):
+        if not (50 <= currency < 100000):
             await msg.delete()
-            await msg.answer('❗️Кол-во звезд должно быть быть не меньше 50 и не больше 1000000')
+            await msg.answer('❗️Кол-во звезд должно быть быть не меньше 50 и не больше 100000')
             return
         dialog_manager.dialog_data['currency'] = currency
         await dialog_manager.switch_to(startSG.get_promo)

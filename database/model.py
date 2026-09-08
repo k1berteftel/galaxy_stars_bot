@@ -48,7 +48,16 @@ class ApplicationsTable(Base):
     3 - Ошибка выполнения
     """
     payment: Mapped[Literal['sbp', 'card', 'crypto_bot', 'crypto']] = mapped_column(VARCHAR, default=None, nullable=True)
-    type: Mapped[Literal['stars', 'premium']] = mapped_column(VARCHAR, default=None, server_default=None, nullable=True)
+    type: Mapped[Literal['deleted_gift', 'stars', 'premium']] = mapped_column(VARCHAR, default=None, server_default=None, nullable=True)
+
+
+class PaycorePayment(Base):
+    __tablename__ = 'paycore-payment'
+
+    app_id: Mapped[int] = mapped_column(ForeignKey('applications.uid_key'))
+
+    order_id: Mapped[str] = mapped_column(VARCHAR)
+    # status: Mapped[Literal['paid', 'pending', 'failed']] = mapped_column(VARCHAR, default='pending')
 
 
 class DeeplinksTable(Base):

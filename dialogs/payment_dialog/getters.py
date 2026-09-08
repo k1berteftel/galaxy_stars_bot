@@ -8,7 +8,7 @@ from aiogram_dialog.widgets.input import ManagedTextInput
 from nats.js import JetStreamContext
 
 from utils.payments.create_payment import (get_oxa_payment_data, get_crypto_payment_data,
-                                           get_freekassa_sbp, get_freekassa_card, _get_usdt_rub)
+                                           get_paycore_payment, _get_usdt_rub)
 from utils.payments.process_payment import wait_for_payment
 from utils.transactions import get_stars_price
 from database.action_data_class import DataInteraction
@@ -37,7 +37,14 @@ async def menu_getter(event_from_user: User, dialog_manager: DialogManager, **kw
     promo = dialog_manager.dialog_data.get('promo')
     prices = await session.get_prices()
     usdt_rub = await _get_usdt_rub()
-    if rate == 'stars':
+    if rate == 'deleted_gift':
+        amount = currency
+        usdt = round(amount / usdt_rub, 2)
+        gift_name = dialog_manager.dialog_data.get('gift')
+        text = (f'<blockquote> - <b>Номер заказа:</b> <code>{{app_id}}</code>\n - Получатель: {username}\n'
+                f' - Подарок: {gift_name}\n - Сумма к оплате: {amount}₽ ({usdt}$)</blockquote>')
+        currency = int(dialog_manager.dialog_data.get('gift_id'))
+    elif rate == 'stars':
         usdt = await get_stars_price(currency)
         if usdt is None:
             await dialog_manager.done()
@@ -74,21 +81,38 @@ async def payment_choose(clb: CallbackQuery, widget: Button, dialog_manager: Dia
     promo = dialog_manager.dialog_data.get('promo')
     prices = await session.get_prices()
     usdt_rub = await _get_usdt_rub()
-    if rate == 'stars':
+    if rate == 'deleted_gift':
+        amount = currency
+        usdt = round(amount / usdt_rub, 2)
+        currency = int(dialog_manager.dialog_data.get('gift_id'))
+    elif rate == 'stars':
         usdt = await get_stars_price(currency)
         amount = round((usdt * usdt_rub) / (1 - prices.stars_charge / 100), 2)
         if promo:
             amount = amount - (amount * promo / 100)
         usdt = round(amount / usdt_rub, 2)
+
     else:
         usdt = premium_usdt[currency]
         amount = round((usdt * usdt_rub) / (1 - prices.premium_charge / 100), 2)
         usdt = round(amount / (usdt_rub), 2)
 
     if payment_type == 'card':
-        payment = await get_freekassa_card(clb.from_user.id, amount, app_id)
+        if rate == 'stars':
+            payment = await get_paycore_payment(amount, app_id, 'card', currency, username)
+        else:
+            payment = await get_paycore_payment(amount, app_id, 'card')
+
+        if payment:
+            await session.add_paycore_app(app_id, payment.get('order_id'))
     elif payment_type == 'sbp':
-        payment = await get_freekassa_sbp(clb.from_user.id, amount, app_id)
+        if rate == 'stars':
+            payment = await get_paycore_payment(amount, app_id, 'sbp', currency, username)
+        else:
+            payment = await get_paycore_payment(amount, app_id, 'sbp')
+
+        if payment:
+            await session.add_paycore_app(app_id, payment.get('order_id'))
     elif payment_type == 'crypto':
         payment = await get_oxa_payment_data(amount)
         task = asyncio.create_task(

@@ -4,7 +4,7 @@ import json
 from aiogram import Bot
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
-from fastapi import APIRouter, Request, Form
+from fastapi import APIRouter, Request, Form, HTTPException, status
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from nats.js import JetStreamContext
@@ -36,6 +36,49 @@ async def ping(response: Request, us_userId: str | int = Form(...), CUR_ID: str 
         payment = 'card'
     if trans_type == 44:
         payment = 'sbp'
+    data = {
+        'transfer_type': application.type,
+        'username': application.receiver,
+        'currency': application.amount,
+        'payment': payment,
+        'app_id': application.uid_key
+    }
+    await send_publisher_data(
+        js=js,
+        subject=config.consumer.subject,
+        data=data
+    )
+    job = scheduler.get_job(f'payment_{user_id}')
+    if job:
+        job.remove()
+    stop_job = scheduler.get_job(f'stop_payment_{user_id}')
+    if stop_job:
+        stop_job.remove()
+    return "OK"
+
+
+@router.post('/paycore')
+async def handle_paycore(response: Request):
+    session: DataInteraction = response.app.state.session
+    scheduler: AsyncIOScheduler = response.app.state.scheduler
+    js: JetStreamContext = response.app.state.js
+    try:
+        data = await response.json()
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"Payload is not allowed"
+        )
+
+    order_id = data.get('order_id')
+    paycore_app = await session.get_paycore_app_by_order_id(order_id)
+    application = await session.get_application(paycore_app.app_id)
+    user_id = application.user_id
+
+    if application.status in [0, 2, 3]:
+        return "OK"
+
+    payment = data.get('method')
     data = {
         'transfer_type': application.type,
         'username': application.receiver,
