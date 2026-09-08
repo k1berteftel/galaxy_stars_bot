@@ -32,7 +32,7 @@ class UsersTable(Base):
 class ApplicationsTable(Base):
     __tablename__ = 'applications'
 
-    uid_key: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    uid_key: Mapped[int] = mapped_column(BigInteger, primary_key=True, unique=True)
 
     user_id: Mapped[int] = mapped_column(ForeignKey('users.user_id'))
     receiver: Mapped[str] = mapped_column(VARCHAR)

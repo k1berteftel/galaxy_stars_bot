@@ -98,7 +98,7 @@ class TransactionConsumer:
             user = await session.get_user(user_id)
             if buy == 'deleted_gift':
                 status = await transfer_gift(username, currency)
-            if buy == 'stars':
+            elif buy == 'stars':
                 status = await transfer_stars(username, currency)
             elif buy == 'premium':
                 status = await transfer_premium(username, currency)
