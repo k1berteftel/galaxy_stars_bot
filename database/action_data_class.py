@@ -163,12 +163,13 @@ class DataInteraction():
             return await self.get_application(uid_key)
 
     async def add_paycore_app(self, app_id: int, order_id: str):
-        async with self._sessions() as session:
-            await session.execute(insert(PaycorePayment).values(
-                app_id=app_id,
-                order_id=order_id
-            ))
-            await session.commit()
+        if not await self.get_paycore_app_by_app_id(app_id):
+            async with self._sessions() as session:
+                await session.execute(insert(PaycorePayment).values(
+                    app_id=app_id,
+                    order_id=order_id
+                ))
+                await session.commit()
 
     async def get_applications(self):
         async with self._sessions() as session:

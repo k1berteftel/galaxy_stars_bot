@@ -54,7 +54,7 @@ class ApplicationsTable(Base):
 class PaycorePayment(Base):
     __tablename__ = 'paycore-payment'
 
-    app_id: Mapped[int] = mapped_column(ForeignKey('applications.uid_key'))
+    app_id: Mapped[int] = mapped_column(ForeignKey('applications.uid_key'), primary_key=True)
 
     order_id: Mapped[str] = mapped_column(VARCHAR)
     # status: Mapped[Literal['paid', 'pending', 'failed']] = mapped_column(VARCHAR, default='pending')
