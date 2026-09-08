@@ -25,10 +25,7 @@ premium_usdt = {
 
 async def menu_getter(event_from_user: User, dialog_manager: DialogManager, **kwargs):
     if dialog_manager.start_data:
-        dialog_manager.dialog_data['rate'] = dialog_manager.start_data.get('rate')
-        dialog_manager.dialog_data['username'] = dialog_manager.start_data.get('username')
-        dialog_manager.dialog_data['currency'] = dialog_manager.start_data.get('currency')
-        dialog_manager.dialog_data['promo'] = dialog_manager.start_data.get('promo')
+        dialog_manager.dialog_data.update(dialog_manager.start_data)
         dialog_manager.start_data.clear()
     session: DataInteraction = dialog_manager.middleware_data.get('session')
     rate = dialog_manager.dialog_data.get('rate')
