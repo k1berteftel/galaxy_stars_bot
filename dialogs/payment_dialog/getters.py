@@ -31,7 +31,7 @@ async def menu_getter(event_from_user: User, dialog_manager: DialogManager, **kw
         dialog_manager.dialog_data.update(dialog_manager.start_data)
         dialog_manager.start_data.clear()
     session: DataInteraction = dialog_manager.middleware_data.get('session')
-    logger.info('go to menu_getter')
+    #logger.info('go to menu_getter')
     rate = dialog_manager.dialog_data.get('rate')
     username = dialog_manager.dialog_data.get('username')
     currency = dialog_manager.dialog_data.get('currency')
@@ -39,14 +39,14 @@ async def menu_getter(event_from_user: User, dialog_manager: DialogManager, **kw
     prices = await session.get_prices()
     usdt_rub = await _get_usdt_rub()
     if rate == 'deleted_gift':
-        logger.info('choosen deleted_gift rate')
+        #logger.info('choosen deleted_gift rate')
         amount = currency
         usdt = round(amount / usdt_rub, 2)
         gift_name = dialog_manager.dialog_data.get('gift')
         text = (f'<blockquote> - <b>Номер заказа:</b> <code>{{app_id}}</code>\n - Получатель: {username}\n'
                 f' - Подарок: {gift_name}\n - Сумма к оплате: {amount}₽ ({usdt}$)</blockquote>')
         currency = int(dialog_manager.dialog_data.get('gift_id'))
-        logger.info(text)
+        #logger.info(text)
     elif rate == 'stars':
         usdt = await get_stars_price(currency)
         if usdt is None:
