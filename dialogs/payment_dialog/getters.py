@@ -70,6 +70,7 @@ async def menu_getter(event_from_user: User, dialog_manager: DialogManager, **kw
         app_id = application.uid_key
         dialog_manager.dialog_data['app_id'] = app_id
     text = text.format(app_id=app_id)
+
     return {'text': text}
 
 

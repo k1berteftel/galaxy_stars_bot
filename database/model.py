@@ -36,7 +36,7 @@ class ApplicationsTable(Base):
 
     user_id: Mapped[int] = mapped_column(ForeignKey('users.user_id'))
     receiver: Mapped[str] = mapped_column(VARCHAR)
-    amount: Mapped[int] = mapped_column(Integer)
+    amount: Mapped[int] = mapped_column(BigInteger)
     rub: Mapped[int] = mapped_column(Integer)
     usdt: Mapped[float] = mapped_column(Float)
     create: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=False), default=func.now())
