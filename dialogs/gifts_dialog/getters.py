@@ -76,6 +76,7 @@ async def payment_switcher(clb: CallbackQuery, widget: Button, dialog_manager: D
         'emoji_id': gift.get('emoji_id'),
         'currency': gift.get('price')
     }
+    print('gifts here')
     await dialog_manager.start(PaymentSG.menu, data=data)
 
 
