@@ -1,4 +1,5 @@
 import asyncio
+import logging
 
 from aiogram.types import CallbackQuery, User, Message
 from aiogram_dialog import DialogManager, ShowMode
@@ -10,6 +11,10 @@ from nats.js import JetStreamContext
 from database.action_data_class import DataInteraction
 from config_data.config import load_config, Config
 from states.state_groups import GiftsSG, PaymentSG
+
+
+logger = logging.getLogger(__name__)
+
 
 
 DELETED_GIFTS = [
@@ -76,7 +81,7 @@ async def payment_switcher(clb: CallbackQuery, widget: Button, dialog_manager: D
         'emoji_id': gift.get('emoji_id'),
         'currency': gift.get('price')
     }
-    print('gifts here')
+    logger.info('gifts here')
     await dialog_manager.start(PaymentSG.menu, data=data)
 
 
