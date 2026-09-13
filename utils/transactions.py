@@ -3,7 +3,6 @@ import aiohttp
 import json
 import logging
 from functools import wraps
-from pyrogram import Client
 
 from config_data.config import load_config, Config
 
@@ -11,18 +10,17 @@ from utils.payments.create_payment import _get_ton_usdt
 
 
 config: Config = load_config()
-logger = logging.getLogger(__name__)
 
-app = Client(config.user_bot.session, api_id=config.user_bot.api_id, api_hash=config.user_bot.api_hash)
-BASE_URL = 'https://fragbridge.ru'
+
+BASE_URL = 'https://robynhood.parssms.info/'
 
 
 headers = {
-    'Api-Key': config.fragment.api_key
+    'X-API-Key': config.fragment.api_key
 }
 
 
-def retry_request_decorator(max_retries=2, delay=5):
+def subgram_api_decorator(max_retries=2, delay=5):
     def decorator(func):
         @wraps(func)
         async def wrapper(*args, **kwargs):
@@ -40,53 +38,77 @@ def retry_request_decorator(max_retries=2, delay=5):
     return decorator
 
 
+@subgram_api_decorator()
 async def get_stars_price(amount: int) -> float:
-    url = BASE_URL + '/rate/stars'
+    url = BASE_URL + 'api/prices'
+    data = {
+        'product_type': 'stars',
+        'quantity': str(amount)
+    }
     async with aiohttp.ClientSession() as session:
-        async with session.get(url, headers=headers, ssl=False) as resp:
+        async with session.get(url, params=data, headers=headers, ssl=False) as resp:
+            if resp.status not in [200, 201]:
+                try:
+                    with open('err_trans.txt', 'a', encoding='utf-8') as f:
+                        f.write(f'JSON получения цены: {await resp.json()}\n\n')
+                except Exception:
+                    with open('err_trans.txt', 'a', encoding='utf-8') as f:
+                        f.write(f'Content получения цены: {await resp.text()}\n\n')
+                raise Exception
             data = await resp.json()
-            print(data)
-            usdt_per_star = data.get('usdt_per_star')
-    return round(usdt_per_star * amount, 5)
+            ton = await _get_ton_usdt()
+    return round(float(data['price']) * ton, 5)
 
 
-# print(asyncio.run(get_stars_price(50)))
-
-
+@subgram_api_decorator()
 async def transfer_stars(username: str, stars: int) -> bool:
-    url = BASE_URL + 'purchase/stars'
+    url = BASE_URL + 'api/purchase'
     data = {
-        "currency":  int(stars),
-        "receiver": username,
+        "product_type": "stars",
+        "recipient": username,
+        "quantity":  str(stars),
+        #"idempotency_key": config.fragment.api_key
     }
     async with aiohttp.ClientSession() as session:
         async with session.post(url, json=data, headers=headers) as response:
             if response.status not in [200, 201]:
+                try:
+                    with open('err_trans.txt', 'a', encoding='utf-8') as f:
+                        f.write(f'JSON транзакции:{await response.json()}\n\n')
+                except Exception:
+                    with open('err_trans.txt', 'a', encoding='utf-8') as f:
+                        f.write(f'Content транзакции:{await response.text()}\n\n')
                 return False
             data = await response.json()
-            if not data['ok']:
-                logger.error(f'Transfer stars error - {data.get("code")}: {data.get("message")}')
-                return False
+            print(data)
     return True
 
 
+@subgram_api_decorator()
 async def transfer_premium(username: str, months: int):
-    url = BASE_URL + 'purchase/premium'
+    url = BASE_URL + 'api/purchase'
     data = {
-        "currency":  months,
-        "receiver": username,
+        "product_type": "premium",
+        "recipient": username,
+        "months": str(months),
+        #"idempotency_key": config.fragment.api_key
     }
     async with aiohttp.ClientSession() as session:
         async with session.post(url, json=data, headers=headers) as response:
             if response.status not in [200, 201]:
+                try:
+                    with open('err_trans.txt', 'a', encoding='utf-8') as f:
+                        f.write(f'JSON Premium:{await response.json()}\n\n')
+                except Exception:
+                    with open('err_trans.txt', 'a', encoding='utf-8') as f:
+                        f.write(f'Content Premium:{await response.text()}\n\n')
                 return False
             data = await response.json()
-            if not data['ok']:
-                logger.error(f'Transfer premium error - {data.get("code")}: {data.get("message")}')
-                return False
+            print(data)
     return True
 
 
+@subgram_api_decorator()
 async def transfer_ton(username: str, amount: int):
     url = 'https://tg.parssms.info/v1/ads/topup'
     data = {
@@ -116,36 +138,29 @@ async def transfer_ton(username: str, amount: int):
     return True
 
 
-async def check_user_premium(username: str):
-    url = BASE_URL + 'check/premium'
+@subgram_api_decorator()
+async def check_user_premium(username: str, months: int):
+    url = BASE_URL + 'api/test/purchase'
     data = {
-        "username": username
+        "product_type": "premium",
+        "recipient": username,
+        "months": str(months),
+        #"idempotency_key": config.fragment.api_key
     }
     async with aiohttp.ClientSession() as session:
         async with session.post(url, json=data, headers=headers) as response:
             if response.status not in [200, 201]:
-                logger.error(f'Error while check user premium request: {await response.text()}')
+                try:
+                    with open('err_trans.txt', 'a', encoding='utf-8') as f:
+                        f.write(f'JSON Premium:{await response.json()}\n\n')
+                except Exception:
+                    with open('err_trans.txt', 'a', encoding='utf-8') as f:
+                        f.write(f'Content Premium:{await response.text()}\n\n')
                 return False
             data = await response.json()
-
-    return data.get('is_premium')
-
-
-@retry_request_decorator()
-async def transfer_gift(username: str, currency: int):
-    async with app:
-        try:
-            msg = await app.send_gift(
-                chat_id=username,
-                gift_id=currency,
-                is_private=True
-            )
-            return True
-        except Exception as err:
-            raise err
-    return False
+            print(data)
+    return True
 
 
 
 #print(asyncio.run(get_stars_price(50)))
-#print(asyncio.run(transfer_stars('xcgan', 50)))
