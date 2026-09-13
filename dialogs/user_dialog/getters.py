@@ -7,7 +7,7 @@ from aiogram_dialog.widgets.kbd import Button, Select
 from aiogram_dialog.widgets.input import ManagedTextInput
 
 from utils.tables import get_table
-from utils.transactions import get_stars_price
+from utils.transactions import get_stars_price, check_user_premium
 from utils.payments.create_payment import _get_usdt_rub, _get_ton_usdt
 from database.action_data_class import DataInteraction
 from config_data.config import load_config, Config
@@ -45,8 +45,8 @@ async def pay_menu_getter(event_from_user: User, dialog_manager: DialogManager, 
         username = '@' + event_from_user.username
         dialog_manager.dialog_data['username'] = username
     if rate == 'stars':
-        text = (f'<b>⭐️Покупка Telegram Stars</b>\n - Получатель: {username}\n\n'
-                f'<em>Чтобы поменять кол-во звезд для покупки <b>введите кол-во звезд текстом👇 '
+        text = (f'<b><tg-emoji emoji-id="5954135079662916434">⭐️</tg-emoji>Покупка Telegram Stars</b>\n - Получатель: {username}\n\n'
+                f'<em>Чтобы поменять кол-во звезд для покупки <b>введите кол-во звезд текстом<tg-emoji emoji-id="5470177992950946662">👇</tg-emoji>'
                 f'(от 50 до 1000000)</b></em>')
         buttons = [
             ('50', '50'),
@@ -55,8 +55,8 @@ async def pay_menu_getter(event_from_user: User, dialog_manager: DialogManager, 
             ('1000', '1000')
         ]
     else:
-        text = (f'<b>Покупка Telegram Premium</b>\n - Получатель: {username}\n\n'
-                f'<em>Чтобы продолжить выберите внизу тариф подписки👇 </em>')
+        text = (f'<b><tg-emoji emoji-id="6190484269513586305">🌟</tg-emoji>Покупка Telegram Premium</b>\n - Получатель: {username}\n\n'
+                f'<em>Чтобы продолжить выберите внизу тариф подписки<tg-emoji emoji-id="5470177992950946662">👇</tg-emoji></em>')
         buttons = [
             ('3 месяца', '3'),
             ('6 месяцев', '6'),
@@ -76,11 +76,11 @@ async def get_currency_amount(msg: Message, widget: ManagedTextInput, dialog_man
             currency = int(text)
         except Exception:
             await msg.delete()
-            await msg.answer('❗️Кол-во звезд должно быть числом, пожалуйста попробуйте снова')
+            await msg.answer('<tg-emoji emoji-id="5467928559664242360">❗️</tg-emoji>Кол-во звезд должно быть числом, пожалуйста попробуйте снова')
             return
         if not (50 <= currency < 100000):
             await msg.delete()
-            await msg.answer('❗️Кол-во звезд должно быть быть не меньше 50 и не больше 100000')
+            await msg.answer('<tg-emoji emoji-id="5467928559664242360">❗️</tg-emoji>Кол-во звезд должно быть быть не меньше 50 и не больше 100000')
             return
         dialog_manager.dialog_data['currency'] = currency
         await dialog_manager.switch_to(startSG.get_promo)
@@ -92,26 +92,35 @@ async def get_currency_amount(msg: Message, widget: ManagedTextInput, dialog_man
 async def pay_menu_selector(clb: CallbackQuery, widget: Select, dialog_manager: DialogManager, item_id: str):
     dialog_manager.dialog_data['currency'] = int(item_id)
     rate = dialog_manager.dialog_data.get('rate')
+    username = dialog_manager.dialog_data.get('username')
+    currency = dialog_manager.dialog_data.get('currency')
     if rate == 'stars':
         await dialog_manager.switch_to(startSG.get_promo)
         return
-    rate = dialog_manager.dialog_data.get('rate')
-    username = dialog_manager.dialog_data.get('username')
-    currency = dialog_manager.dialog_data.get('currency')
+    elif rate == 'premium':
+        if not await check_user_premium(username):
+            await clb.message.answer(
+                '<tg-emoji emoji-id="5467928559664242360">❗️</tg-emoji>У данного пользователя уже есть подписка, пожалуйста выберите другого получателя')
+            return
     start_data = {'rate': rate, 'username': username, 'currency': currency}
     await dialog_manager.start(PaymentSG.menu, data=start_data)
 
 
 async def get_username(msg: Message, widget: ManagedTextInput, dialog_manager: DialogManager, text: str):
+    rate = dialog_manager.dialog_data.get('rate')
     text = text.strip()
     if not text.startswith('@'):
         await msg.delete()
-        await msg.answer('❗️Юзернейм должен начинать со знака "@", пожалуйста попробуйте снова')
+        await msg.answer('<tg-emoji emoji-id="5467928559664242360">❗️</tg-emoji>Юзернейм должен начинать со знака "@", пожалуйста попробуйте снова')
         return
     if ' ' in text:
         await msg.delete()
-        await msg.answer('❗Юзернейм должен быть в формате "@username", пожалуйста попробуйте снова')
+        await msg.answer('<tg-emoji emoji-id="5467928559664242360">❗️</tg-emoji>Юзернейм должен быть в формате "@username", пожалуйста попробуйте снова')
         return
+    if rate == 'premium':
+        if not await check_user_premium(text):
+            await msg.answer('<tg-emoji emoji-id="5467928559664242360">❗️</tg-emoji>У данного пользователя уже есть подписка, пожалуйста выберите кого-нибудь другого')
+            return
     dialog_manager.dialog_data['username'] = text
     await dialog_manager.switch_to(startSG.pay_menu)
 
@@ -120,9 +129,9 @@ async def get_promo(msg: Message, widget: ManagedTextInput, dialog_manager: Dial
     session: DataInteraction = dialog_manager.middleware_data.get('session')
     promo = await session.check_promo(msg.from_user.id, text)
     if not promo:
-        await msg.answer('😔К сожалению такого промокода не было найдено или же вы уже вводили его')
+        await msg.answer('<tg-emoji emoji-id="5435857806936777022">😔</tg-emoji>К сожалению такого промокода не было найдено или же вы уже вводили его')
         return
-    await msg.answer('✅Промокод был успешно активирован')
+    await msg.answer('<tg-emoji emoji-id="5456432998092133477">✅</tg-emoji>Промокод был успешно активирован')
     dialog_manager.dialog_data['promo'] = promo.percent
     rate = dialog_manager.dialog_data.get('rate')
     username = dialog_manager.dialog_data.get('username')
@@ -157,7 +166,7 @@ async def get_derive_amount_switcher(clb: CallbackQuery, widget: Button, dialog_
     session: DataInteraction = dialog_manager.middleware_data.get('session')
     user = await session.get_user(clb.from_user.id)
     if user.earn < 100:
-        await clb.answer('❗️Сумма для вывода 100 звезд или более .')
+        await clb.answer('<tg-emoji emoji-id="5467928559664242360">❗️</tg-emoji>Сумма для вывода 100 звезд или более .')
         return
     await dialog_manager.switch_to(startSG.get_derive_amount)
 
@@ -167,19 +176,19 @@ async def get_derive_amount(msg: Message, widget: ManagedTextInput, dialog_manag
         amount = int(text)
     except Exception:
         await msg.delete()
-        await msg.answer('❗️Сумма для вывода должна быть числом, пожалуйста попробуйте снова')
+        await msg.answer('<tg-emoji emoji-id="5467928559664242360">❗️</tg-emoji>Сумма для вывода должна быть числом, пожалуйста попробуйте снова')
         return
     if amount < 50:
-        await msg.answer('❗️Сумма для вывода не может быть меньше 50')
+        await msg.answer('<tg-emoji emoji-id="5467928559664242360">❗️</tg-emoji>Сумма для вывода не может быть меньше 50')
         return
     session: DataInteraction = dialog_manager.middleware_data.get('session')
     msg_user = await session.get_user(msg.from_user.id)
     if amount > msg_user.earn:
-        await msg.answer('❗️Сумма для вывода должна быть не больше той что сейчас у вас')
+        await msg.answer('<tg-emoji emoji-id="5467928559664242360">❗️</tg-emoji>Сумма для вывода должна быть не больше той что сейчас у вас')
         return
     username = msg.from_user.username
     if not username:
-        await msg.answer(text='❗️Чтобы получить звезды, пожалуйста поставьте на свой аккаунт юзернейм')
+        await msg.answer(text='<tg-emoji emoji-id="5467928559664242360">❗️</tg-emoji>Чтобы получить звезды, пожалуйста поставьте на свой аккаунт юзернейм')
         return
     ref_users = await session.get_ref_users(msg.from_user.id)
     users = []
@@ -242,7 +251,7 @@ async def rate_menu_getter(event_from_user: User, dialog_manager: DialogManager,
     amount = round((usdt * usdt_rub) / (1 - prices.stars_charge / 100), 2)
     usdt = round(amount / usdt_rub, 3)
     ton = round(usdt / usdt_ton, 6)
-    text = (f'<b>🪙 Актуальные курсы:</b><em>\n\t 1⭐️- {amount}₽\n\t1⭐️- {usdt}$\n\t1⭐️- {ton} TON</em>'
+    text = (f'<b>🪙 Актуальные курсы:</b><em>\n\t 1<tg-emoji emoji-id="5954135079662916434">⭐️</tg-emoji>- {amount}₽\n\t1⭐️- {usdt}$\n\t1<tg-emoji emoji-id="5954135079662916434">⭐️</tg-emoji>- {ton} TON</em>'
             f'\n<b> - 1 USDT = {usdt_rub}₽\n - 1 TON = {ton_rub}₽</b>')
     return {'text': text}
 

@@ -45,6 +45,25 @@ logging.basicConfig(
     style='{'
 )
 
+for name in (
+    "pyrogram",
+    "pyrogram.client",
+    "pyrogram.session",
+    "pyrogram.session.session",
+    "pyrogram.connection",
+    "pyrogram.connection.connection",
+    "pyrogram.dispatcher",
+    "pyrogram.methods",
+    "pyrogram.syncer",
+    # kurigram — форк pyrogram, имена логгеров те же,
+    # но на всякий случай оставим и их
+    "kurigram",
+    "kurigram.client",
+    "kurigram.session",
+    "kurigram.dispatcher",
+):
+    logging.getLogger(name).setLevel(logging.INFO)
+
 
 logger = logging.getLogger(__name__)
 

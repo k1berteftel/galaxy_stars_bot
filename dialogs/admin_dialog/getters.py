@@ -191,7 +191,8 @@ async def application_menu_getter(dialog_manager: DialogManager, **kwargs):
         'stars': 'Покупка звезд',
         None: 'Покупка звезд',
         'premium': 'Покупка премиум',
-        'ton': 'Покупка TON'
+        'ton': 'Покупка TON',
+        'deleted_gift': 'Удаленный подарок'
     }
     text = (f'<b>Тип заказа</b>: {types.get(application.type)}\n'
             f'<b>Номер заказа</b>: {application.uid_key}\n<b>Создал</b>: {application.user_id} (@{user.username})'

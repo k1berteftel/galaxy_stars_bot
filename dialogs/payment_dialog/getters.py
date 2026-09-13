@@ -1,6 +1,7 @@
 import asyncio
 import logging
 
+from aiogram import Bot
 from aiogram.types import CallbackQuery, User, Message
 from aiogram_dialog import DialogManager, ShowMode
 from aiogram_dialog.api.entities import MediaAttachment
@@ -26,10 +27,26 @@ premium_usdt = {
 }
 
 
+async def polling_app_status(app_id: int, session: DataInteraction, bot: Bot, timeout: int = 60 * 20):
+    async def check_app_status(app_id: int, session: DataInteraction):
+        while True:
+            application = await session.get_application(app_id)
+            if application.status != 1:
+                return
+            await asyncio.sleep(30)
+    try:
+        await asyncio.wait_for(check_app_status(app_id, session), timeout=timeout)
+    except TimeoutError:
+        await session.update_application(app_id, 0, None)
+    except Exception:
+        await session.update_application(app_id, 0, None)
+
+
 async def menu_getter(event_from_user: User, dialog_manager: DialogManager, **kwargs):
     if dialog_manager.start_data:
         dialog_manager.dialog_data.update(dialog_manager.start_data)
         dialog_manager.start_data.clear()
+    bot: Bot = dialog_manager.middleware_data.get('bot')
     session: DataInteraction = dialog_manager.middleware_data.get('session')
     #logger.info('go to menu_getter')
     rate = dialog_manager.dialog_data.get('rate')
@@ -70,6 +87,16 @@ async def menu_getter(event_from_user: User, dialog_manager: DialogManager, **kw
         app_id = application.uid_key
         dialog_manager.dialog_data['app_id'] = app_id
     text = text.format(app_id=app_id)
+
+    check_task = None
+    task_name = f'check_app_{event_from_user.id}'
+    for task in asyncio.all_tasks():
+        if task.get_name() == task_name:
+            check_task = task
+            break
+    if not check_task:
+        check_task = asyncio.create_task(polling_app_status(app_id, session, bot))
+        check_task.set_name(task_name)
 
     return {'text': text}
 

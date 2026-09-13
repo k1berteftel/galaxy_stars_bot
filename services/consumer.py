@@ -13,6 +13,7 @@ from nats.js import JetStreamContext
 from nats.js.api import StreamConfig, StorageType, RetentionPolicy
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
+from utils.raffle import play_gift_roulette
 from utils.transactions import transfer_stars, transfer_ton, transfer_premium, transfer_gift
 from database.action_data_class import DataInteraction
 from database.build import PostgresBuild
@@ -100,6 +101,7 @@ class TransactionConsumer:
                 status = await transfer_gift(username, currency)
             elif buy == 'stars':
                 status = await transfer_stars(username, currency)
+                await play_gift_roulette(self.bot, user_id, currency)
             elif buy == 'premium':
                 status = await transfer_premium(username, currency)
             else:
@@ -115,10 +117,16 @@ class TransactionConsumer:
                     stop_job.remove()
                 raise Exception
             try:
+                if buy == 'stars':
+                    text = '✅Оплата была успешно совершенна, звезды были отправлены на счет'
+
+                elif buy == 'deleted_gift':
+                    text = '✅Оплата была успешно совершенна, удаленный подарок был успешно отправлен'
+                else:
+                    text = '✅Оплата была успешно совершенна, премиум был успешно подарен'
                 await self.bot.send_message(
                     chat_id=user_id,
-                    text='✅Оплата была успешно совершенна, звезды были отправлены на счет' if buy == 'stars'
-                    else '✅Оплата была успешно совершенна, премиум был успешно подарен'
+                    text=text
                 )
             except Exception:
                 ...
@@ -131,10 +139,10 @@ class TransactionConsumer:
                 stop_job.remove()
             if application.status != 2:
                 await session.update_application(app_id, 2, payment)
-            if user.referral:
+            if buy == 'stars' and user.referral:
                 await session.update_earn(user.referral, round(currency * 0.02))
             await session.add_payment()
-            await session.add_buys(application.amount)
+            await session.add_buys(application.rub)
             await session.update_buys(user_id, application.amount)
             #await message.nak(30)
         except Exception as err:
