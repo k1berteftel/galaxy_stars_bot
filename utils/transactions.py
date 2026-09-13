@@ -4,6 +4,7 @@ import json
 import logging
 from functools import wraps
 
+from pyrogram import Client
 from config_data.config import load_config, Config
 
 from utils.payments.create_payment import _get_ton_usdt
@@ -18,6 +19,8 @@ BASE_URL = 'https://robynhood.parssms.info/'
 headers = {
     'X-API-Key': config.fragment.api_key
 }
+
+app = Client(config.user_bot.session, api_id=config.user_bot.api_id, api_hash=config.user_bot.api_hash)
 
 
 def subgram_api_decorator(max_retries=2, delay=5):
@@ -160,6 +163,20 @@ async def check_user_premium(username: str, months: int):
             data = await response.json()
             print(data)
     return True
+
+
+async def transfer_gift(username: str, currency: int):
+    async with app:
+        try:
+            msg = await app.send_gift(
+                chat_id=username,
+                gift_id=currency,
+                is_private=True
+            )
+            return True
+        except Exception as err:
+            raise err
+    return False
 
 
 
