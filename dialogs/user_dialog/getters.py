@@ -97,11 +97,11 @@ async def pay_menu_selector(clb: CallbackQuery, widget: Select, dialog_manager: 
     if rate == 'stars':
         await dialog_manager.switch_to(startSG.get_promo)
         return
-    elif rate == 'premium':
-        if not await check_user_premium(username):
-            await clb.message.answer(
-                '<tg-emoji emoji-id="5274099962655816924">❗️</tg-emoji>У данного пользователя уже есть подписка, пожалуйста выберите другого получателя')
-            return
+    # elif rate == 'premium':
+    #     if not await check_user_premium(username):
+    #         await clb.message.answer(
+    #             '<tg-emoji emoji-id="5274099962655816924">❗️</tg-emoji>У данного пользователя уже есть подписка, пожалуйста выберите другого получателя')
+    #         return
     start_data = {'rate': rate, 'username': username, 'currency': currency}
     await dialog_manager.start(PaymentSG.menu, data=start_data)
 
@@ -117,10 +117,10 @@ async def get_username(msg: Message, widget: ManagedTextInput, dialog_manager: D
         await msg.delete()
         await msg.answer('<tg-emoji emoji-id="5274099962655816924">❗️</tg-emoji>Юзернейм должен быть в формате "@username", пожалуйста попробуйте снова')
         return
-    if rate == 'premium':
-        if not await check_user_premium(text):
-            await msg.answer('<tg-emoji emoji-id="5274099962655816924">❗️</tg-emoji>У данного пользователя уже есть подписка, пожалуйста выберите кого-нибудь другого')
-            return
+    # if rate == 'premium':
+    #     if not await check_user_premium(text):
+    #         await msg.answer('<tg-emoji emoji-id="5274099962655816924">❗️</tg-emoji>У данного пользователя уже есть подписка, пожалуйста выберите кого-нибудь другого')
+    #         return
     dialog_manager.dialog_data['username'] = text
     await dialog_manager.switch_to(startSG.pay_menu)
 
