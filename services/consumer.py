@@ -118,12 +118,12 @@ class TransactionConsumer:
                 raise Exception
             try:
                 if buy == 'stars':
-                    text = '✅Оплата была успешно совершенна, звезды были отправлены на счет'
+                    text = '<tg-emoji emoji-id="5206607081334906820">✔️</tg-emoji>Оплата была успешно совершенна, звезды были отправлены на счет'
 
                 elif buy == 'deleted_gift':
-                    text = '✅Оплата была успешно совершенна, удаленный подарок был успешно отправлен'
+                    text = '<tg-emoji emoji-id="5206607081334906820">✔️</tg-emoji>Оплата была успешно совершенна, удаленный подарок был успешно отправлен'
                 else:
-                    text = '✅Оплата была успешно совершенна, премиум был успешно подарен'
+                    text = '<tg-emoji emoji-id="5206607081334906820">✔️</tg-emoji>Оплата была успешно совершенна, премиум был успешно подарен'
                 await self.bot.send_message(
                     chat_id=user_id,
                     text=text
@@ -141,16 +141,22 @@ class TransactionConsumer:
                 await session.update_application(app_id, 2, payment)
             if buy == 'stars' and user.referral:
                 await session.update_earn(user.referral, round(currency * 0.02))
+
+            await session.add_cashflow(int(application.rub))
             await session.add_payment()
             await session.add_buys(application.rub)
             await session.update_buys(user_id, application.amount)
+
+            if user.join:
+                await session.update_deeplink_earn(user.join, int(application.rub))
             #await message.nak(30)
         except Exception as err:
             try:
                 await self.bot.send_message(
                     chat_id=user_id,
-                    text=(f'🚨Во время начисления звезд что-то пошло не так, пожалуйста '
-                          f'обратитесь в поддержку(№ заказа: <code>{app_id}</code>)')
+                    text=(f'<tg-emoji emoji-id="5395695537687123235">🚨</tg-emoji>Во время выполнения '
+                          f'транзакции что-то пошло не так, пожалуйста обратитесь в '
+                          f'поддержку(№ заказа: <code>{app_id}</code>)')
                 )
             except Exception:
                 ...

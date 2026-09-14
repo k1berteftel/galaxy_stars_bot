@@ -16,18 +16,18 @@ user_dialog = Dialog(
         Const('🪐<b>Главное меню</b>\n\nC помощью <b>"Galaxy store"</b> вы можете приобрести '
               '<em>звезды ⭐️</em> и <em>Telegram premium 👑</em>'),
         Column(
-            Button(Const('Купить звезды'), id='stars_pay_choose', on_click=getters.pay_choose, style=Style(emoji_id="5463289097336405244")),
-            Button(Const('Купить премиум'), id='premium_pay_choose', on_click=getters.pay_choose, style=Style(emoji_id="6190484269513586305")),
+            Button(Const('Купить звезды'), id='stars_pay_choose', on_click=getters.pay_choose, style=Style(emoji_id="5438496463044752972")),
+            Button(Const('Купить премиум'), id='premium_pay_choose', on_click=getters.pay_choose, style=Style(emoji_id="5427168083074628963")),
             Start(Const('Удаленные подарки'), id='gift_dialog', state=GiftsSG.choose_gift,
                   style=Style(emoji_id="5203996991054432397")),
         ),
         Row(
-            SwitchTo(Const('Реферальная программа'), id='ref_menu_switcher', state=startSG.ref_menu, style=Style(emoji_id="5377548235709619284")),
-            SwitchTo(Const('ℹ️Информация'), id='rules_menu_switcher', state=startSG.rules_menu),
+            SwitchTo(Const('Реферальная программа'), id='ref_menu_switcher', state=startSG.ref_menu, style=Style(emoji_id="5388632425314140043")),
+            SwitchTo(Const('Информация'), id='rules_menu_switcher', state=startSG.rules_menu, style=Style(emoji_id="5305265301917549162")),
         ),
         Column(
-            SwitchTo(Const('💱Курс'), id='rate_menu_switcher', state=startSG.rate_menu),
-            Url(Const('Тех. поддержка'), id='help_url', url=Const('https://t.me/GalaxyHelpers'), style=Style(emoji_id="5411563083908797492")),
+            SwitchTo(Const('Курс'), id='rate_menu_switcher', state=startSG.rate_menu, style=Style(emoji_id="5402186569006210455")),
+            Url(Const('Тех. поддержка'), id='help_url', url=Const('https://t.me/GalaxyHelpers'), style=Style(emoji_id="5391032818111363540")),
         ),
         Start(Const('Админ панель'), id='admin', state=adminSG.start, when='admin'),
         getter=getters.start_getter,
@@ -99,7 +99,7 @@ user_dialog = Dialog(
     Window(
         Format('{text}'),
         Column(
-            Button(Const('Купить звезды'), id='stars_pay_choose', on_click=getters.pay_choose, style=Style(emoji_id="5463289097336405244")),
+            Button(Const('Купить звезды'), id='stars_pay_choose', on_click=getters.pay_choose, style=Style(emoji_id="5438496463044752972")),
         ),
         SwitchTo(Const('Назад'), id='back', state=startSG.start, style=Style(emoji_id="5388584622328131561")),
         getter=getters.rate_menu_getter,

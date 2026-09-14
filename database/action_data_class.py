@@ -5,7 +5,8 @@ from sqlalchemy import select, insert, update, column, text, delete, and_
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from database.model import (UsersTable, DeeplinksTable, OneTimeLinksIdsTable, AdminsTable, PromosTable,
-                            UserPromoTable, ApplicationsTable, PricesTable, StaticsTable, OpTable, PaycorePayment)
+                            UserPromoTable, ApplicationsTable, PricesTable, StaticsTable, OpTable, PaycorePayment,
+                            CashFlowTable)
 
 
 async def setup_database(session: async_sessionmaker):
@@ -14,6 +15,8 @@ async def setup_database(session: async_sessionmaker):
             await session.execute(insert(PricesTable).values())
         if not await session.scalar(select(StaticsTable)):
             await session.execute(insert(StaticsTable).values())
+        if not await session.scalar(select(CashFlowTable)):
+            await session.execute(insert(CashFlowTable).values())
         await session.commit()
 
 
@@ -70,7 +73,7 @@ class DataInteraction():
             ))
             await session.commit()
 
-    async def add_user(self, user_id: int, username: str, name: str, referral: int | None, sub_referral: int | None):
+    async def add_user(self, user_id: int, username: str, name: str, referral: int | None, sub_referral: int | None, join: str | None = None):
         if await self.check_user(user_id):
             return
         async with self._sessions() as session:
@@ -80,7 +83,8 @@ class DataInteraction():
                 name=name,
                 referral=referral,
                 sub_referral=sub_referral,
-                entry=datetime.datetime.now()
+                entry=datetime.datetime.now(),
+                join=join
             ))
             await session.commit()
 
@@ -99,18 +103,20 @@ class DataInteraction():
                 #earn=UsersTable.earn + 2
             ))
 
-    async def add_entry(self, link: str):
+    async def add_entry(self, id: int):
         async with self._sessions() as session:
-            await session.execute(update(DeeplinksTable).where(DeeplinksTable.link == link).values(
-                entry=DeeplinksTable.entry+1
-            ))
+            await session.execute(
+                update(DeeplinksTable)
+                .where(DeeplinksTable.id == id)
+                .values(entry=DeeplinksTable.entry + 1)
+            )
             await session.commit()
 
-    async def add_deeplink(self, link: str):
+    async def add_deeplink(self, link: str, name: str):
         async with self._sessions() as session:
-            await session.execute(insert(DeeplinksTable).values(
-                link=link
-            ))
+            await session.execute(
+                insert(DeeplinksTable).values(link=link, name=name)
+            )
             await session.commit()
 
     async def add_link(self, link: str):
@@ -272,10 +278,27 @@ class DataInteraction():
             result = await session.scalars(select(AdminsTable))
         return result.fetchall()
 
+    async def get_deeplink(self, id: int):
+        async with self._sessions() as session:
+            result = await session.scalar(select(DeeplinksTable).where(DeeplinksTable.id == id))
+        return result
+
     async def get_deeplinks(self):
         async with self._sessions() as session:
             result = await session.scalars(select(DeeplinksTable))
         return result.fetchall()
+
+    async def get_deeplink_by_link(self, link: str):
+        async with self._sessions() as session:
+            result = await session.scalar(
+                select(DeeplinksTable).where(DeeplinksTable.link == link)
+            )
+        return result
+
+    async def get_cashflow(self):
+        async with self._sessions() as session:
+            result = await session.scalar(select(CashFlowTable))
+        return result
 
     async def update_buys(self, user_id: int, stars: int):
         user = await self.get_user(user_id)
@@ -303,6 +326,28 @@ class DataInteraction():
             await session.execute(update(UsersTable).where(UsersTable.user_id == user_id).values(
                 earn=UsersTable.earn + earn
             ))
+            await session.commit()
+
+    async def update_deeplink_earn(self, deeplink_id: int, earn: int):
+        async with self._sessions() as session:
+            await session.execute(
+                update(DeeplinksTable)
+                .where(DeeplinksTable.id == deeplink_id)
+                .values(
+                    earned=DeeplinksTable.earned + earn,
+                    today=DeeplinksTable.today + earn,
+                    week=DeeplinksTable.week + earn
+                )
+            )
+            await session.commit()
+
+    async def set_deeplink_value(self, deeplink_id: int, **kwargs):
+        async with self._sessions() as session:
+            await session.execute(
+                update(DeeplinksTable)
+                .where(DeeplinksTable.id == deeplink_id)
+                .values(**kwargs)
+            )
             await session.commit()
 
     async def set_activity(self, user_id: int):
@@ -333,6 +378,23 @@ class DataInteraction():
             ))
             await session.commit()
 
+    async def add_cashflow(self, sum: int):
+        async with self._sessions() as session:
+            await session.execute(update(CashFlowTable).values(
+                earn=CashFlowTable.earn + sum,
+                today=CashFlowTable.today + sum,
+                week=CashFlowTable.week + sum,
+                month=CashFlowTable.month + sum
+            ))
+            await session.commit()
+
+    async def set_cashflow_value(self, **kwargs):
+        async with self._sessions() as session:
+            await session.execute(update(CashFlowTable).values(
+                kwargs
+            ))
+            await session.commit()
+
     # async def set_static_value(self, column: str, value: any):
     #     async with self._sessions() as session:
     #         await session.execute(update(StaticsTable).values(
@@ -342,9 +404,9 @@ class DataInteraction():
     #         ))
     #         await session.commit()
 
-    async def del_deeplink(self, link: str):
+    async def del_deeplink(self, id: int):
         async with self._sessions() as session:
-            await session.execute(delete(DeeplinksTable).where(DeeplinksTable.link == link))
+            await session.execute(delete(DeeplinksTable).where(DeeplinksTable.id == id))
             await session.commit()
 
     async def del_link(self, link_id: str):

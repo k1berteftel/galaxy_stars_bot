@@ -16,6 +16,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from app.router import router
 from storage.nats_storage import NatsStorage
 from utils.nats_connect import connect_to_nats
+from utils.start_utils import start_schedulers
 from services.start_consumer import start_transfer_consumer
 from database.build import PostgresBuild
 from database.model import Base
@@ -86,6 +87,8 @@ async def main():
         args=[db],
         hours=4
     )
+
+    await start_schedulers(scheduler, db)
 
 
     """

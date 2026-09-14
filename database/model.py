@@ -18,14 +18,19 @@ class UsersTable(Base):
     username: Mapped[str] = mapped_column(VARCHAR)
     name: Mapped[str] = mapped_column(VARCHAR)
     user_id: Mapped[int] = mapped_column(BigInteger, unique=True)
+
     referral: Mapped[int] = mapped_column(BigInteger, default=None, nullable=True)
     refs: Mapped[int] = mapped_column(Integer, default=0)
     sub_referral: Mapped[int] = mapped_column(BigInteger, default=None, nullable=True)
     sub_refs: Mapped[int] = mapped_column(Integer, default=0, nullable=True)
-    earn: Mapped[int] = mapped_column(Integer, default=0)
+
+    join: Mapped[str] = mapped_column(VARCHAR, nullable=True, default=None, server_default=None)
+
     active: Mapped[int] = mapped_column(Integer, default=1)
     activity: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=False), default=func.now())
     entry: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=False), default=func.now())
+
+    earn: Mapped[int] = mapped_column(Integer, default=0)
     buys: Mapped[int] = mapped_column(Integer, default=0, nullable=True)
 
 
@@ -65,8 +70,15 @@ class DeeplinksTable(Base):
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
 
+    name: Mapped[str] = mapped_column(VARCHAR)
     link: Mapped[str] = mapped_column(VARCHAR)
     entry: Mapped[int] = mapped_column(BigInteger, default=0)
+
+    earned: Mapped[int] = mapped_column(Integer, default=0)
+    today: Mapped[int] = mapped_column(Integer, default=0)
+    week: Mapped[int] = mapped_column(Integer, default=0)
+
+    create: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=False), default=func.now())
 
 
 class AdminsTable(Base):
@@ -131,4 +143,19 @@ class StaticsTable(Base):
 
     payments: Mapped[int] = mapped_column(BigInteger, default=0)
     buys: Mapped[int] = mapped_column(BigInteger, default=0, server_default="0")
+
+
+class CashFlowTable(Base):
+    __tablename__ = 'cashflow'
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+
+    earn: Mapped[int] = mapped_column(BigInteger, default=0)
+
+    today: Mapped[int] = mapped_column(Integer, default=0)
+    yesterday: Mapped[int] = mapped_column(Integer, default=0)
+    before_yesterday: Mapped[int] = mapped_column(Integer, default=0)
+
+    week: Mapped[int] = mapped_column(BigInteger, default=0)
+    month: Mapped[int] = mapped_column(BigInteger, default=0)
 
