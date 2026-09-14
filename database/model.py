@@ -70,7 +70,7 @@ class DeeplinksTable(Base):
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
 
-    name: Mapped[str] = mapped_column(VARCHAR)
+    name: Mapped[str] = mapped_column(VARCHAR, nullable=True)
     link: Mapped[str] = mapped_column(VARCHAR)
     entry: Mapped[int] = mapped_column(BigInteger, default=0)
 
