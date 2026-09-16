@@ -169,13 +169,13 @@ class DataInteraction():
             return await self.get_application(uid_key)
 
     async def add_paycore_app(self, app_id: int, order_id: str):
-        if not await self.get_paycore_app_by_app_id(app_id):
-            async with self._sessions() as session:
-                await session.execute(insert(PaycorePayment).values(
-                    app_id=app_id,
-                    order_id=order_id
-                ))
-                await session.commit()
+        await self.del_paycore_app(app_id)
+        async with self._sessions() as session:
+            await session.execute(insert(PaycorePayment).values(
+                app_id=app_id,
+                order_id=order_id
+            ))
+            await session.commit()
 
     async def get_applications(self):
         async with self._sessions() as session:
@@ -427,6 +427,11 @@ class DataInteraction():
     async def del_application(self, uid_key: int):
         async with self._sessions() as session:
             await session.execute(delete(ApplicationsTable).where(ApplicationsTable.uid_key == uid_key))
+            await session.commit()
+
+    async def del_paycore_app(self, app_id: int):
+        async with self._sessions() as session:
+            await session.execute(delete(PaycorePayment).where(PaycorePayment.app_id == app_id))
             await session.commit()
 
     async def del_op_channel(self, chat_id: int):
