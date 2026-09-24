@@ -101,7 +101,7 @@ class TransactionConsumer:
                 status = await transfer_gift(username, currency)
             elif buy == 'stars':
                 status = await transfer_stars(username, currency)
-                await play_gift_roulette(self.bot, user_id, currency)
+                # await play_gift_roulette(self.bot, user_id, currency)
             elif buy == 'premium':
                 status = await transfer_premium(username, currency)
             else:
