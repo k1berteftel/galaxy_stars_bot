@@ -88,7 +88,7 @@ crypto_bot = AioCryptoPay(token=config.crypto_bot.token, network=Networks.MAIN_N
 
 
 async def get_paycore_payment(amount: int | float, app_id: int, payment_type: Literal['sbp', 'card'], stars: int = None, username: str = None):
-    url = 'https://paycore.ltd/api/init'
+    url = 'http://170.168.61.254:8090/billing-api/init'
     headers = {
         'Content-Type': 'application/json',
         'X-Api-Key': config.paycore.api_key,
@@ -120,6 +120,9 @@ async def get_paycore_payment(amount: int | float, app_id: int, payment_type: Li
         'url': url,
         'order_id': order_id
     }
+
+
+# print(asyncio.run(get_paycore_payment(100, 1001, 'sbp', 100, '@Leggit_dev')))
 
 
 async def get_oxa_payment_data(amount: int | float):
