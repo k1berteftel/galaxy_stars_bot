@@ -100,9 +100,9 @@ async def get_paycore_payment(amount: int | float, app_id: int, payment_type: Li
         "returnLink": "https://test.ru/paycore",
     }
     if stars:
-        data["starsPayment"] = True
-        data["starsAmount"] = stars
-        data["starsAccount"] = username
+        data["is_stars"] = True
+        data["stars_quantity"] = stars
+        data["telegram_username"] = username
     async with ClientSession() as session:
         async with session.post(url, json=data, headers=headers) as res:
             if res.status not in [200, 201]:
@@ -122,7 +122,60 @@ async def get_paycore_payment(amount: int | float, app_id: int, payment_type: Li
     }
 
 
-# print(asyncio.run(get_paycore_payment(100, 1001, 'sbp', 100, '@Leggit_dev')))
+#print(asyncio.run(get_paycore_payment(100, 1001, 'sbp', 100, '@Leggit_dev')))
+
+
+async def get_xrocket_payment(amount: int | float):
+    usdt_rub = await _get_usdt_rub()
+    usdt = round(amount / (usdt_rub), 2)
+
+    url = 'https://pay.api.xrocket.exchange/api/v1/invoices'
+    headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': f'Bearer {config.xrocket.api_key}'
+
+    }
+    data = {
+        'priceAmount': str(usdt),
+        'numPayments': 1,
+        'priceCurrency': 'USDT'
+    }
+    async with ClientSession() as session:
+        async with session.post(url, json=data, headers=headers, ssl=False) as resp:
+            if resp.status != 200:
+                print(await resp.json())
+                print(resp.status)
+            data = await resp.json()
+            print(data)
+    return {
+        'url': data['links']['telegramBotLink'],
+        'id': data['id']
+    }
+
+# print(asyncio.run(get_xroket_payment(50)))
+
+
+async def check_xrocket_payment(invoice_id: str):
+    url = 'https://pay.api.xrocket.exchange/api/v1/invoice'
+    headers = {
+        # 'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': f'Bearer {config.xrocket.api_key}'
+
+    }
+    data = {
+        'invoiceId': invoice_id
+    }
+    async with ClientSession() as session:
+        async with session.get(url, params=data, headers=headers, ssl=False) as resp:
+            if resp.status != 200:
+                print(await resp.json())
+                print(resp.status)
+            data = await resp.json()
+    return data['status'] == 'paid'
+
+# print(asyncio.run(check_xroket_payment('6515866')))
 
 
 async def get_oxa_payment_data(amount: int | float):

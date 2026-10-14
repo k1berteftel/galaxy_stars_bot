@@ -34,6 +34,11 @@ class Oxa:
 
 
 @dataclass
+class Xrocket:
+    api_key: str
+
+
+@dataclass
 class FreeKassa:
     api_key: str
 
@@ -74,6 +79,7 @@ class Config:
     freekassa: FreeKassa
     paycore: Paycore
     user_bot: UserBot
+    xrocket: Xrocket
 
 
 def load_config(path: str | None = None) -> Config:
@@ -115,5 +121,8 @@ def load_config(path: str | None = None) -> Config:
             api_id=int(env('api_id')),
             api_hash=env('api_hash'),
             session=env('session_name')
+        ),
+        xrocket=Xrocket(
+            api_key=env('xrocket_api_key')
         )
     )
