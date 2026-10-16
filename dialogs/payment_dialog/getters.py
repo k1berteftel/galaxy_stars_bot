@@ -118,7 +118,10 @@ async def payment_choose(clb: CallbackQuery, widget: Button, dialog_manager: Dia
         currency = int(dialog_manager.dialog_data.get('gift_id'))
     elif rate == 'stars':
         usdt = await get_stars_price(currency)
+        logger.info(f'price: {usdt}')
         amount = round((usdt * usdt_rub) / (1 - prices.stars_charge / 100), 2)
+        logger.info(f'after calculate: {amount}')
+        logger.info(f'promo is {promo}')
         if promo:
             amount = amount - (amount * promo / 100)
         usdt = round(amount / usdt_rub, 2)
