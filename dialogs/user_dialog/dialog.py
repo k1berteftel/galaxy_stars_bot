@@ -29,7 +29,7 @@ user_dialog = Dialog(
             #SwitchTo(Const('Реферальная программа'), id='ref_menu_switcher', state=startSG.ref_menu, style=Style(emoji_id="5388632425314140043")),
             SwitchTo(Const('Информация'), id='rules_menu_switcher', state=startSG.rules_menu, style=Style(emoji_id="5305265301917549162")),
         ),
-        Column(
+        Row(
             #SwitchTo(Const('Курс'), id='rate_menu_switcher', state=startSG.rate_menu, style=Style(emoji_id="5402186569006210455")),
             Url(Const('VPN'), id='vpn_url', url=Const('https://t.me/GalaxyStarsVPNbot'), style=Style(emoji_id="5920344347152224466")),
             Url(Const('Поддержка'), id='help_url', url=Const('https://t.me/GalaxyHelpers'), style=Style(emoji_id="5391032818111363540", style='primary')),
