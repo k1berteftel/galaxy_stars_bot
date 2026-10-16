@@ -122,6 +122,7 @@ async def payment_choose(clb: CallbackQuery, widget: Button, dialog_manager: Dia
         if promo:
             amount = amount - (amount * promo / 100)
         usdt = round(amount / usdt_rub, 2)
+        logger.info(f'amount before pay: {amount}')
     else:
         usdt = premium_usdt[currency]
         amount = round((usdt * usdt_rub) / (1 - prices.premium_charge / 100), 2)
