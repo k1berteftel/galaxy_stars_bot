@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import datetime
 import hmac
 import hashlib
@@ -10,6 +11,7 @@ from aiocryptopay import AioCryptoPay, Networks
 from config_data.config import Config, load_config
 
 
+logger = logging.getLogger(__name__)
 config: Config = load_config()
 crypto_bot = AioCryptoPay(token=config.crypto_bot.token, network=Networks.MAIN_NET)
 
@@ -106,11 +108,11 @@ async def get_paycore_payment(amount: int | float, app_id: int, payment_type: Li
     async with ClientSession() as session:
         async with session.post(url, json=data, headers=headers) as res:
             if res.status not in [200, 201]:
-                print(res.status)
+                logger.error(res.status)
                 try:
-                    print(await res.json())
+                    logger.error(await res.json())
                 except Exception:
-                    print(await res.text())
+                    logger.error(await res.text())
                 return None
             data = await res.json()
             url = data.get('url')
@@ -122,7 +124,7 @@ async def get_paycore_payment(amount: int | float, app_id: int, payment_type: Li
     }
 
 
-# print(asyncio.run(get_paycore_payment(100, 1001, 'sbp', 100, '@Leggit_dev')))
+print(asyncio.run(get_paycore_payment(100, 1001, 'sbp', 100, '@Leggit_dev')))
 
 
 async def get_xrocket_payment(amount: int | float):
