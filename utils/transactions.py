@@ -214,7 +214,7 @@ async def get_stars_price(amount: int) -> float:
     return float(price)
 
 
-asyncio.run(get_stars_price(50))
+# asyncio.run(get_stars_price(50))
 
 
 @subgram_api_decorator()
