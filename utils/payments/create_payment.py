@@ -97,18 +97,19 @@ async def get_paycore_payment(amount: int | float, app_id: int, payment_type: Li
     }
     data = {
         "method": payment_type,
-        "amount": amount,
+        "amount": float(amount * 1.07),
         "description": f"Оплата заказа №{app_id}",
         "returnLink": "https://test.ru/paycore",
     }
     if stars:
         data["is_stars"] = True
-        data["stars_quantity"] = stars
+        data["stars_quantity"] = int(stars)
         data["telegram_username"] = username
     async with ClientSession() as session:
         async with session.post(url, json=data, headers=headers) as res:
             if res.status not in [200, 201]:
                 logger.error(res.status)
+                logger.info(f'{amount}, {app_id}, {payment_type}, {stars}, {username}')
                 try:
                     logger.error(await res.json())
                 except Exception:
@@ -124,7 +125,7 @@ async def get_paycore_payment(amount: int | float, app_id: int, payment_type: Li
     }
 
 
-print(asyncio.run(get_paycore_payment(100, 1001, 'sbp', 100, '@Leggit_dev')))
+#print(asyncio.run(get_paycore_payment(67.6, 1001, 'sbp', 100, '@Leggit_dev')))
 
 
 async def get_xrocket_payment(amount: int | float):
