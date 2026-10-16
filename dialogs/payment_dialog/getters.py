@@ -73,14 +73,14 @@ async def menu_getter(event_from_user: User, dialog_manager: DialogManager, **kw
         if promo:
             amount = amount - (amount * promo / 100)
         usdt = round(amount / usdt_rub, 2)
-        text = (f'<blockquote> - <b>Номер заказа:</b> <code>{{app_id}}</code>\n - Получатель: {username}\n'
-                f' - Количество звезд: {currency}\n - Сумма к оплате: {amount}₽ ({usdt}$)</blockquote>')
+        text = (f'<blockquote> - <b>Номер заказа:</b> <code>{{app_id}}</code>\n - <b>Получатель:</b> {username}\n'
+                f' - <b>Количество звезд:</b> {currency}\n - <b>Сумма к оплате:</b> {amount}₽ ({usdt}$)</blockquote>')
     else:
         usdt = premium_usdt[currency]
         amount = round((usdt * usdt_rub) / (1 - prices.premium_charge / 100), 2)
         usdt = round(amount / (usdt_rub), 2)
-        text = (f'<blockquote> - <b>Номер заказа:</b> <code>{{app_id}}</code>\n - Получатель: {username}\n'
-                f' - Подписка на: {currency} (месяцы)\n - Сумма к оплате: {amount}₽ ({usdt}$)</blockquote>')
+        text = (f'<blockquote> - <b>Номер заказа:</b> <code>{{app_id}}</code>\n - <b>Получатель:</b> {username}\n'
+                f' - <b>Подписка на:</b> {currency} (месяцы)\n - <b>Сумма к оплате:</b> {amount}₽ ({usdt}$)</blockquote>')
     app_id = dialog_manager.dialog_data.get('app_id')
     if not app_id:
         application = await session.add_application(event_from_user.id, username, currency, amount, usdt, rate)
