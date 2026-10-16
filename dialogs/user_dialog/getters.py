@@ -24,7 +24,7 @@ async def start_getter(event_from_user: User, dialog_manager: DialogManager, **k
     admins.extend([admin.user_id for admin in await session.get_admins()])
     if event_from_user.id in admins:
         admin = True
-    media = MediaAttachment(type=ContentType.PHOTO, path='photos/galaxy_menu.png')
+    media = MediaAttachment(type=ContentType.PHOTO, path='photos/main_banner.png')
     return {
         'media': media,
         'admin': admin
@@ -45,7 +45,7 @@ async def pay_menu_getter(event_from_user: User, dialog_manager: DialogManager, 
         username = '@' + event_from_user.username
         dialog_manager.dialog_data['username'] = username
     if rate == 'stars':
-        text = (f'<b><tg-emoji emoji-id="5438496463044752972">⭐️</tg-emoji>Покупка Telegram Stars</b>\n - Получатель: {username}\n\n'
+        text = (f'<b><tg-emoji emoji-id="5954135079662916434">⭐</tg-emoji>Покупка Telegram Stars</b>\n - Получатель: {username}\n\n'
                 f'<em>Чтобы поменять кол-во звезд для покупки <b>введите кол-во звезд текстом<tg-emoji emoji-id="5470177992950946662">👇</tg-emoji>'
                 f'(от 50 до 1000000)</b></em>')
         buttons = [
@@ -54,15 +54,18 @@ async def pay_menu_getter(event_from_user: User, dialog_manager: DialogManager, 
             ('500', '500'),
             ('1000', '1000')
         ]
+        media = MediaAttachment(type=ContentType.PHOTO, path='photos/stars_banner.png')
     else:
-        text = (f'<b><tg-emoji emoji-id="5427168083074628963">🌟</tg-emoji>Покупка Telegram Premium</b>\n - Получатель: {username}\n\n'
+        text = (f'<b><tg-emoji emoji-id="5954135079662916434">⭐</tg-emoji>Покупка Telegram Premium</b>\n - Получатель: {username}\n\n'
                 f'<em>Чтобы продолжить выберите внизу тариф подписки<tg-emoji emoji-id="5470177992950946662">👇</tg-emoji></em>')
         buttons = [
             ('3 месяца', '3'),
             ('6 месяцев', '6'),
             ('12 месяцев', '12')
         ]
+        media = MediaAttachment(type=ContentType.PHOTO, path='photos/premium_banner.png')
     return {
+        'media': media,
         'text': text,
         'items': buttons,
         'username': username
@@ -94,9 +97,9 @@ async def pay_menu_selector(clb: CallbackQuery, widget: Select, dialog_manager: 
     rate = dialog_manager.dialog_data.get('rate')
     username = dialog_manager.dialog_data.get('username')
     currency = dialog_manager.dialog_data.get('currency')
-    if rate == 'stars':
-        await dialog_manager.switch_to(startSG.get_promo)
-        return
+    # if rate == 'stars':
+    #     await dialog_manager.switch_to(startSG.get_promo)
+    #     return
     # elif rate == 'premium':
     #     if not await check_user_premium(username):
     #         await clb.message.answer(
