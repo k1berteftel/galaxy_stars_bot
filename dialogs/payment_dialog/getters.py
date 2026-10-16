@@ -9,7 +9,7 @@ from aiogram_dialog.widgets.kbd import Button, Select
 from aiogram_dialog.widgets.input import ManagedTextInput
 from nats.js import JetStreamContext
 
-from utils.payments.create_payment import (get_xrocket_payment, get_crypto_payment_data,
+from utils.payments.create_payment import (get_xrocket_payment, get_oxa_payment_data, get_crypto_payment_data,
                                            get_paycore_payment, _get_usdt_rub)
 from utils.payments.process_payment import wait_for_payment
 from utils.transactions import get_stars_price
@@ -148,7 +148,7 @@ async def payment_choose(clb: CallbackQuery, widget: Button, dialog_manager: Dia
 
         if payment:
             await session.add_paycore_app(app_id, payment.get('order_id'))
-    elif payment_type == 'crypto':
+    elif payment_type == 'cryptoX':
         payment = await get_xrocket_payment(amount)
         task = asyncio.create_task(
             wait_for_payment(
@@ -160,7 +160,26 @@ async def payment_choose(clb: CallbackQuery, widget: Button, dialog_manager: Dia
                 js=js,
                 currency=currency,
                 rate=rate,
-                payment_type='crypto',
+                payment_type='cryptoX',
+            )
+        )
+        for active_task in asyncio.all_tasks():
+            if active_task.get_name() == f'process_payment_{clb.from_user.id}':
+                active_task.cancel()
+        task.set_name(f'process_payment_{clb.from_user.id}')
+    elif payment_type == 'cryptoO':
+        payment = await get_oxa_payment_data(amount)
+        task = asyncio.create_task(
+            wait_for_payment(
+                payment_id=payment.get('id'),
+                user_id=clb.from_user.id,
+                app_id=app_id,
+                bot=clb.bot,
+                session=session,
+                js=js,
+                currency=currency,
+                rate=rate,
+                payment_type='cryptoO',
             )
         )
         for active_task in asyncio.all_tasks():

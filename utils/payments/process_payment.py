@@ -6,7 +6,7 @@ from aiogram import Bot
 from nats.js import JetStreamContext
 
 from services.publisher import send_publisher_data
-from utils.payments.create_payment import check_crypto_payment, check_xrocket_payment
+from utils.payments.create_payment import check_crypto_payment, check_xrocket_payment, check_oxa_payment
 from database.action_data_class import DataInteraction
 from config_data.config import Config, load_config
 
@@ -23,7 +23,7 @@ async def wait_for_payment(
         js: JetStreamContext,
         currency: int,
         rate: Literal['stars', 'premium'],
-        payment_type: Literal['crypto', 'cryptoBot'],
+        payment_type: Literal['cryptoO', 'cryptoX', 'cryptoBot'],
         timeout: int = 60 * 15,
         check_interval: int = 6
 ):
@@ -47,8 +47,10 @@ async def _poll_payment(payment_id, user_id: int, app_id, currency: int, js: Jet
     Завершается, когда платёж оплачен.
     """
     while True:
-        if payment_type == 'crypto':
+        if payment_type == 'cryptoX':
             status = await check_xrocket_payment(payment_id)
+        elif payment_type == 'cryptoO':
+            status = await check_oxa_payment(payment_id)
         else:
             status = await check_crypto_payment(payment_id)
         if status:
