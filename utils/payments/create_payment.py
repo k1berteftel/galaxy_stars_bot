@@ -99,7 +99,7 @@ async def get_paycore_payment(amount: int | float, app_id: int, payment_type: Li
         "method": payment_type,
         "amount": float(amount * 1.07),
         "description": f"Оплата заказа №{app_id}",
-        "returnLink": "https://test.ru/paycore",
+        "returnLink": "https://impudently-hot-grub.cloudpub.ru:443/paycore",
     }
     if stars:
         data["is_stars"] = True
