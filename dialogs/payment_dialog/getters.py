@@ -9,7 +9,7 @@ from aiogram_dialog.widgets.kbd import Button, Select
 from aiogram_dialog.widgets.input import ManagedTextInput
 from nats.js import JetStreamContext
 
-from utils.payments.create_payment import (get_oxa_payment_data, get_crypto_payment_data,
+from utils.payments.create_payment import (get_xrocket_payment, get_crypto_payment_data,
                                            get_paycore_payment, _get_usdt_rub)
 from utils.payments.process_payment import wait_for_payment
 from utils.transactions import get_stars_price
@@ -144,7 +144,7 @@ async def payment_choose(clb: CallbackQuery, widget: Button, dialog_manager: Dia
         if payment:
             await session.add_paycore_app(app_id, payment.get('order_id'))
     elif payment_type == 'crypto':
-        payment = await get_oxa_payment_data(amount)
+        payment = await get_xrocket_payment(amount)
         task = asyncio.create_task(
             wait_for_payment(
                 payment_id=payment.get('id'),

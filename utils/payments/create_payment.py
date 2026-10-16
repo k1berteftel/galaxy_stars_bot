@@ -146,6 +146,7 @@ async def get_xrocket_payment(amount: int | float):
             if resp.status != 200:
                 print(await resp.json())
                 print(resp.status)
+                return
             data = await resp.json()
             print(data)
     return {
@@ -172,6 +173,7 @@ async def check_xrocket_payment(invoice_id: str):
             if resp.status != 200:
                 print(await resp.json())
                 print(resp.status)
+                return
             data = await resp.json()
     return data['status'] == 'paid'
 
@@ -195,6 +197,7 @@ async def get_oxa_payment_data(amount: int | float):
             if resp.status != 200:
                 print(await resp.json())
                 print(resp.status)
+                return
             data = await resp.json()
             print(data)
             print(type(data['status']), data['status'])

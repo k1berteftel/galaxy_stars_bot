@@ -6,7 +6,7 @@ from aiogram import Bot
 from nats.js import JetStreamContext
 
 from services.publisher import send_publisher_data
-from utils.payments.create_payment import check_crypto_payment, check_oxa_payment
+from utils.payments.create_payment import check_crypto_payment, check_xrocket_payment
 from database.action_data_class import DataInteraction
 from config_data.config import Config, load_config
 
@@ -48,7 +48,7 @@ async def _poll_payment(payment_id, user_id: int, app_id, currency: int, js: Jet
     """
     while True:
         if payment_type == 'crypto':
-            status = await check_oxa_payment(payment_id)
+            status = await check_xrocket_payment(payment_id)
         else:
             status = await check_crypto_payment(payment_id)
         if status:
