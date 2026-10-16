@@ -112,6 +112,7 @@ async def payment_choose(clb: CallbackQuery, widget: Button, dialog_manager: Dia
     promo = dialog_manager.dialog_data.get('promo')
     prices = await session.get_prices()
     usdt_rub = await _get_usdt_rub()
+    logger.info(f'Calculated rate: {rate}')
     if rate == 'deleted_gift':
         amount = currency
         usdt = round(amount / usdt_rub, 2)
