@@ -146,7 +146,7 @@ async def get_xrocket_payment(amount: int | float):
     }
     async with ClientSession() as session:
         async with session.post(url, json=data, headers=headers, ssl=False) as resp:
-            if resp.status != 200:
+            if resp.status not in [200, 201]:
                 print(await resp.json())
                 print(resp.status)
                 return
@@ -157,7 +157,7 @@ async def get_xrocket_payment(amount: int | float):
         'id': data['id']
     }
 
-# print(asyncio.run(get_xroket_payment(50)))
+# print(asyncio.run(get_xrocket_payment(50)))
 
 
 async def check_xrocket_payment(invoice_id: str):

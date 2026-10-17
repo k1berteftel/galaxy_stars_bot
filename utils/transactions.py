@@ -335,5 +335,4 @@ async def transfer_gift(username: str, currency: int):
     return False
 
 
-
-#print(asyncio.run(get_stars_price(50)))
+print(asyncio.run(get_stars_price(50)))
