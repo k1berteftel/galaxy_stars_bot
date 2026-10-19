@@ -100,7 +100,10 @@ async def menu_getter(event_from_user: User, dialog_manager: DialogManager, **kw
 
     media = MediaAttachment(type=ContentType.PHOTO, path='photos/payment_banner.png')
 
-    return {'text': text}
+    return {
+        'media': media,
+        'text': text
+    }
 
 
 async def payment_choose(clb: CallbackQuery, widget: Button, dialog_manager: DialogManager):
