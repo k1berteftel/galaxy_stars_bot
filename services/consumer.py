@@ -118,12 +118,14 @@ class TransactionConsumer:
                 raise Exception
             try:
                 if buy == 'stars':
-                    text = '<tg-emoji emoji-id="5206607081334906820">✔️</tg-emoji>Оплата была успешно совершенна, звезды были отправлены на счет'
+                    text = ('<b>Звезды были успешно отправлены на баланс '
+                            '<tg-emoji emoji-id="5774022692642492953">✅</tg-emoji></b>\n\n<blockquote>Спасибо за '
+                            'покупку <tg-emoji emoji-id="5890925363067886150">✨</tg-emoji></blockquote>')
 
                 elif buy == 'deleted_gift':
                     text = '<tg-emoji emoji-id="5206607081334906820">✔️</tg-emoji>Оплата была успешно совершенна, удаленный подарок был успешно отправлен'
                 else:
-                    text = '<tg-emoji emoji-id="5206607081334906820">✔️</tg-emoji>Оплата была успешно совершенна, премиум был успешно подарен'
+                    text = '<b>TG Premium был успешно отправлен на аккаунт <tg-emoji emoji-id="5774022692642492953">✅</tg-emoji></b>\n\n<blockquote>Спасибо за покупку <tg-emoji emoji-id="5890925363067886150">✨</tg-emoji></blockquote>'
                 await self.bot.send_message(
                     chat_id=user_id,
                     text=text
@@ -154,9 +156,10 @@ class TransactionConsumer:
             try:
                 await self.bot.send_message(
                     chat_id=user_id,
-                    text=(f'<tg-emoji emoji-id="5395695537687123235">🚨</tg-emoji>Во время выполнения '
-                          f'транзакции что-то пошло не так, пожалуйста обратитесь в '
-                          f'поддержку(№ заказа: <code>{app_id}</code>)')
+                    text=(f'<b><tg-emoji emoji-id="5440660757194744323">‼</tg-emoji>Упсс, что-то пошло не так '
+                          f'<tg-emoji emoji-id="5774077015388852135">❌</tg-emoji></b>\n\n<blockquote>Пожалуйста, '
+                          f'обратитесь в поддержку @GalaxyHelpers '
+                          f'<tg-emoji emoji-id="5983580310292402968">🤖</tg-emoji></blockquote>')
                 )
             except Exception:
                 ...

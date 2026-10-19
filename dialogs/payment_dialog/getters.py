@@ -2,7 +2,7 @@ import asyncio
 import logging
 
 from aiogram import Bot
-from aiogram.types import CallbackQuery, User, Message
+from aiogram.types import CallbackQuery, User, Message, ContentType
 from aiogram_dialog import DialogManager, ShowMode
 from aiogram_dialog.api.entities import MediaAttachment
 from aiogram_dialog.widgets.kbd import Button, Select
@@ -97,6 +97,8 @@ async def menu_getter(event_from_user: User, dialog_manager: DialogManager, **kw
     if not check_task:
         check_task = asyncio.create_task(polling_app_status(app_id, session, bot))
         check_task.set_name(task_name)
+
+    media = MediaAttachment(type=ContentType.PHOTO, path='photos/payment_banner.png')
 
     return {'text': text}
 

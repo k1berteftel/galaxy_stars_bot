@@ -12,6 +12,7 @@ from states.state_groups import startSG, PaymentSG
 
 payment_dialog = Dialog(
     Window(
+        DynamicMedia('media'),
         Format('{text}\n'),
         Const('<b><tg-emoji emoji-id="5269440193722623278">🏦</tg-emoji>Выберите способ оплаты:</b>'),
         Column(

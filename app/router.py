@@ -66,6 +66,7 @@ async def handle_paycore(response: Request):
     session: DataInteraction = response.app.state.session
     scheduler: AsyncIOScheduler = response.app.state.scheduler
     js: JetStreamContext = response.app.state.js
+    bot: Bot = response.app.state.bot
     logger.info('Trying to get json of request')
     try:
         data = await response.json()
@@ -96,6 +97,13 @@ async def handle_paycore(response: Request):
         'app_id': application.uid_key
     }
     logger.info(f'Sending "{data}" to consumer')
+    try:
+        await bot.send_message(
+            chat_id=user_id,
+            text='<b><tg-emoji emoji-id="6041720006973067267">👍</tg-emoji> Оплата прошла успешно.</b>'
+        )
+    except Exception:
+        ...
     await send_publisher_data(
         js=js,
         subject=config.consumer.subject,

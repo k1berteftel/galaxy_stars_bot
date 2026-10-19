@@ -56,7 +56,7 @@ async def _poll_payment(payment_id, user_id: int, app_id, currency: int, js: Jet
         if status:
             await bot.send_message(
                 chat_id=user_id,
-                text='✅Оплата прошла успешно'
+                text='<b><tg-emoji emoji-id="6041720006973067267">👍</tg-emoji> Оплата прошла успешно.</b>'
             )
             await execute_rate(app_id, currency, rate, payment_type, js,  bot, session)
             break

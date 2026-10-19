@@ -125,6 +125,7 @@ async def main():
 
     app = FastAPI()
     app.include_router(router)
+    app.state.bot = bot
     app.state.nc = nc
     app.state.js = js
     app.state.scheduler = scheduler
