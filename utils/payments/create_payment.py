@@ -102,9 +102,9 @@ async def get_paycore_payment(amount: int | float, app_id: int, payment_type: Li
         "returnLink": "https://impudently-hot-grub.cloudpub.ru:443/paycore",
     }
     if stars:
-        data["is_stars"] = True
-        data["stars_quantity"] = int(stars)
-        data["telegram_username"] = username
+        data["starsPayment"] = True
+        data["starsAmount"] = int(stars)
+        data["starsAccount"] = username
     async with ClientSession() as session:
         async with session.post(url, json=data, headers=headers) as res:
             if res.status not in [200, 201]:

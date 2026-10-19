@@ -23,7 +23,7 @@ user_dialog = Dialog(
             Button(Const('Купить премиум'), id='premium_pay_choose', on_click=getters.pay_choose, style=Style(emoji_id="5874948844935974490")),
             # Start(Const('Удаленные подарки'), id='gift_dialog', state=GiftsSG.choose_gift,
             #       style=Style(emoji_id="5203996991054432397")),
-            Url(Const('Игры на звезды'), id='casino_url', url=Const('https://t.me/GalaxySpin777'), style=Style(emoji_id="5994370062708904465")),
+            #Url(Const('Игры на звезды'), id='casino_url', url=Const('https://t.me/GalaxySpin777'), style=Style(emoji_id="5994370062708904465")),
         ),
         Row(
             #SwitchTo(Const('Реферальная программа'), id='ref_menu_switcher', state=startSG.ref_menu, style=Style(emoji_id="5388632425314140043")),
