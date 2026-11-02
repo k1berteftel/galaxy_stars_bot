@@ -19,20 +19,21 @@ user_dialog = Dialog(
               'с также аренда NFT.\n<tg-emoji emoji-id="5219943216781995020">⚡</tg-emoji>Пополняйте баланс за пару '
               'кликов.</em></blockquote>\n\n<b><tg-emoji emoji-id="6032644646587338669">🎁</tg-emoji> Выдача товаров моментальна!</b>'),
         Column(
-            Button(Const('Купить звезды'), id='stars_pay_choose', on_click=getters.pay_choose, style=Style(emoji_id="5954135079662916434", style='success')),
-            Button(Const('Купить премиум'), id='premium_pay_choose', on_click=getters.pay_choose, style=Style(emoji_id="5874948844935974490")),
+            Button(Const('Купить звезды'), id='stars_pay_choose', on_click=getters.pay_choose, style=Style(emoji_id="6028338546736107668")),
+            Button(Const('Купить премиум'), id='premium_pay_choose', on_click=getters.pay_choose, style=Style(emoji_id="5773677501825945508")),
             # Start(Const('Удаленные подарки'), id='gift_dialog', state=GiftsSG.choose_gift,
             #       style=Style(emoji_id="5203996991054432397")),
             #Url(Const('Игры на звезды'), id='casino_url', url=Const('https://t.me/GalaxySpin777'), style=Style(emoji_id="5994370062708904465")),
         ),
         Row(
+            SwitchTo(Const('Профиль'), id='profile_switcher', state=startSG.profile, style=Style(emoji_id="5936017305585586269")),
             #SwitchTo(Const('Реферальная программа'), id='ref_menu_switcher', state=startSG.ref_menu, style=Style(emoji_id="5388632425314140043")),
-            SwitchTo(Const('Информация'), id='rules_menu_switcher', state=startSG.rules_menu, style=Style(emoji_id="5305265301917549162")),
+            SwitchTo(Const('Информация'), id='rules_menu_switcher', state=startSG.rules_menu, style=Style(emoji_id="5766902139376898645")),
         ),
         Row(
             #SwitchTo(Const('Курс'), id='rate_menu_switcher', state=startSG.rate_menu, style=Style(emoji_id="5402186569006210455")),
-            Url(Const('VPN'), id='vpn_url', url=Const('https://t.me/GalaxyStarsVPNbot'), style=Style(emoji_id="5920344347152224466")),
-            Url(Const('Поддержка'), id='help_url', url=Const('https://t.me/GalaxyHelpers'), style=Style(emoji_id="5391032818111363540", style='primary')),
+            Url(Const('VPN'), id='vpn_url', url=Const('https://t.me/GalaxyStarsVPNbot'), style=Style(emoji_id="5920344347152224466", style='success')),
+            Url(Const('Поддержка'), id='help_url', url=Const('https://t.me/GalaxyHelpers'), style=Style(emoji_id="5983580310292402968", style='primary')),
         ),
         Start(Const('Админ панель'), id='admin', state=adminSG.start, when='admin'),
         getter=getters.start_getter,
@@ -117,7 +118,17 @@ user_dialog = Dialog(
             id='get_derive_amount',
             on_success=getters.get_derive_amount
         ),
-        SwitchTo(Const('Назад'), id='back_ref_menu', state=startSG.ref_menu, style=Style(emoji_id="5388584622328131561")),
+        SwitchTo(Const('Назад'), id='back_ref_menu', state=startSG.profile, style=Style(emoji_id="5388584622328131561")),
         state=startSG.get_derive_amount
+    ),
+    Window(
+        Format('{text}'),
+        Column(
+            Url(Const('Поделиться ботом'), id='share_url', url=Format('{url}'), style=Style(emoji_id="5372849966689566579")),
+            Button(Const('💰Вывести'), id='get_derive_amount_switcher', on_click=getters.get_derive_amount_switcher),
+        ),
+        SwitchTo(Const('Назад'), id='back', state=startSG.start, style=Style(emoji_id="5388584622328131561")),
+        getter=getters.profile_getter,
+        state=startSG.profile
     ),
 )

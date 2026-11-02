@@ -261,3 +261,18 @@ async def rate_menu_getter(event_from_user: User, dialog_manager: DialogManager,
             f'\n<b> - 1 USDT = {usdt_rub}₽\n - 1 TON = {ton_rub}₽</b>')
     return {'text': text}
 
+
+async def profile_getter(event_from_user: User, dialog_manager: DialogManager, **kwargs):
+    session: DataInteraction = dialog_manager.middleware_data.get('session')
+    user = await session.get_user(event_from_user.id)
+    text = (f'<b><tg-emoji emoji-id="5936017305585586269">🪪</tg-emoji> Профиль</b>\n\n'
+            f'🎁<b>Реферальная программа</b>\n🔗Ваша ссылка:\n\t'
+            f'<code>t.me/GalaxyStoreStarBot?start={event_from_user.id}</code>\n\n'
+            f'<blockquote>Вы получаете по 2% от каждой покупки вашего реферала</blockquote>'
+            f'\n - 👤Рефералы (lvl-1): {user.refs}\n - '
+            f'💰Всего заработано: {user.earn}⭐️\n<b>Данные об аккаунте</b>:\n - 🧺Куплено звезд: {user.buys}⭐️')
+    return {
+        'text': text,
+        'url': f'http://t.me/share/url?url=https://t.me/GalaxyStoreStarBot?start={event_from_user.id}'
+    }
+

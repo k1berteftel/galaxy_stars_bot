@@ -17,6 +17,8 @@ class startSG(StatesGroup):
 
     rate_menu = State()
 
+    profile = State()
+
 
 class GiftsSG(StatesGroup):
     choose_gift = State()

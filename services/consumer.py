@@ -147,7 +147,8 @@ class TransactionConsumer:
             await session.add_cashflow(int(application.rub))
             await session.add_payment()
             await session.add_buys(application.rub)
-            await session.update_buys(user_id, application.amount)
+            if buy == 'stars':
+                await session.update_buys(user_id, application.amount)
 
             if user.join:
                 await session.update_deeplink_earn(user.join, int(application.rub))
